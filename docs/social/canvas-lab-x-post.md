@@ -12,6 +12,7 @@ Canvas Lab 开源版上线 🎬
 
 没有 API 也能本地预览。不锁平台、不塞会员墙，默认不上传素材。
 桌面端 · 本地优先
+把下一部作品，从一张画布开始。
 GitHub：https://github.com/deathcmd/Infinite-Canvas
 
 #开源 #AI创作 #无限画布
