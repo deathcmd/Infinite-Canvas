@@ -2,18 +2,31 @@
 
 配套宣传图：`docs/social/canvas-lab-x-promo-20260901.png`
 
-## 推荐推文（中文）
+## 推荐推文（中文·增强版）
 
 ```text
+灵感不该散落在十几个窗口里。
+
 Canvas Lab 开源版上线 🎬
+把剧本、图片、视频、音频、提示词和 3D 导演台拖进同一张无限画布。节点一连，青蓝流体随线流动，微光指引方向；复杂工作流终于看得见、理得清、改得快。
 
-把剧本、图片、视频、音频、提示词和 3D 导演台放进一张可连线的无限画布。连续流体连线与沿线闪光，让复杂工作流一眼可读；未配置 provider 也能先用本地预览。
-
-桌面端 · 本地优先 · 无会员/积分/付费入口
+没有 API 也能本地预览。不锁平台、不塞会员墙，默认不上传素材。
+桌面端 · 本地优先
 GitHub：https://github.com/deathcmd/Infinite-Canvas
 
-欢迎反馈：2734891913@qq.com
-#OpenSource #CreativeTools #AIWorkflow
+#开源 #AI创作 #无限画布
+```
+
+## 中文短版（适合配图单帖）
+
+```text
+把灵感从十几个窗口，搬回一张会流动的无限画布。🎬
+
+Canvas Lab：剧本、图片、视频、音频、提示词和 3D 导演台，拖进来就能连成工作流。青蓝流体沿线流动，微光提示方向；没有 API 也能先用本地预览。
+
+桌面端 · 本地优先 · 开源
+GitHub：https://github.com/deathcmd/Infinite-Canvas
+#开源 #AI创作 #无限画布
 ```
 
 ## English alternative
