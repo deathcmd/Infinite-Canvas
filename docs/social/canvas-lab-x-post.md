@@ -40,4 +40,3 @@ GitHub: https://github.com/deathcmd/Infinite-Canvas
 3. 粘贴上面的中文推文；如果面向海外读者，再使用 English alternative。
 4. 在图片的“添加描述”中粘贴 Alt text，方便读屏用户。
 5. 发布前检查链接是否为 `https://github.com/deathcmd/Infinite-Canvas`，不要把 `API/.env`、画布数据或个人素材作为附件上传。
-
