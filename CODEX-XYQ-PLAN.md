@@ -672,7 +672,7 @@ git diff --check
 ### 14.6 联系方式和开源边界
 
 - `static/js/brand-config.js` 是唯一的项目品牌/联系方式入口；当前默认值为“画布实验室 / CL / deathcmd”，并展示 `2734891913@qq.com` 与 `https://x.com/deathcmd527`。`static/js/brand-ui.js` 会在入口、首页、导演台及 10 个辅助工具页统一渲染“联系我”弹窗。
-- 发布前应直接编辑 `brand-config.js` 的 `appName`、`shortName`、`maintainerName`、`contacts`、`repositoryUrl`、`issueUrl`，填入发布者自己的公开信息；在用户尚未提供真实联系方式的情况下，不能擅自替换成猜测的邮箱、群号或 URL。
+- 发布前应直接编辑 `brand-config.js` 的 `appName`、`shortName`、`maintainerName`、`contacts`、`repositoryUrl`、`issueUrl`，填入发布者自己的公开信息；在用户尚未提供真实联系方式的情况下，不能擅自替换成猜测的邮箱、群号或 URL。本次发布已使用发布者提供的 `deathcmd`、邮箱、X 主页和目标仓库地址。
 - 本轮没有会员、积分、钱包、手机号、付费开关或远程生成依赖，不调用 Grok；所有批量删除、流体动效、视口迁移和付费模型标签过滤都在本地开源数据和现有 API 契约内完成。发布包仍不得包含 `API/.env`、浏览器会话、个人数据和临时截图。
 - `static/seedance25-video-workflow.json` 虽保留旧导出文件名以便迁移，payload 已改为中性的本地视频预览（provider/model/计费字段为空、默认短时长），并由 `tests/test_open_source_audit.py::test_model_agnostic_workflow_contract` 中的 fixture 契约锁定；不把旧文件名误当成运行时厂商选择。
 

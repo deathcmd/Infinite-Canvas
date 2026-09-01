@@ -199,15 +199,23 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\check-public-release
 
 ```powershell
 git commit -m "发布 Canvas Lab 开源版本"
-gh auth login
-gh repo create <你的 GitHub 用户名>/canvas-lab --public --source . --remote origin --push
 ```
 
-如果仓库已经有 `origin`，不要再次创建远程仓库；先执行 `git remote -v` 核对地址，再使用：
+本项目的公开仓库地址是：<https://github.com/deathcmd/Infinite-Canvas>。如果你是从本仓库继续开发，先核对远程地址，再推送：
 
 ```powershell
+git remote -v
 git push -u origin main
 ```
+
+如果你要把源码发布到自己的另一个 GitHub 仓库，不要把个人素材复制进去；先在 GitHub 网页创建一个空仓库（不要勾选自动添加 README），再替换远程地址：
+
+```powershell
+git remote set-url origin https://github.com/<你的用户名>/<你的仓库>.git
+git push -u origin main
+```
+
+只有在没有现成仓库时才需要使用 `gh repo create`；已经有 `origin` 时不要重复创建远程仓库。
 
 ### 4）推送后的复核
 
@@ -217,7 +225,7 @@ git push -u origin main
 git ls-tree -r --name-only HEAD | Select-String -Pattern '(^|/)(API/\.env|\.env$|data/|assets/|output/|artifacts/|history\.json|user_attachment|.*\.log$)'
 ```
 
-上面命令没有输出才算通过。仅仅“后来删除文件”不能清除旧提交历史；如果旧历史曾包含密钥或个人数据，请新建空的公开仓库，或在推送前使用 `git filter-repo` 清理历史并重新轮换所有曾经暴露的 Key。
+上面命令没有输出才算通过。仅仅“后来删除文件”不能清除旧提交历史；如果旧历史曾包含密钥或个人数据，请新建空的公开仓库，或在推送前使用 `git filter-repo` 清理历史并重新轮换所有曾经暴露的 Key。本仓库的公开 `main` 已从经过审计的单一基线提交开始，避免把旧上游历史带入公开仓库。
 
 ## 目录速览
 
