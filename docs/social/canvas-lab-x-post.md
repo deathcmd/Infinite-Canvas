@@ -1,6 +1,8 @@
 # Canvas Lab X 发布素材
 
-配套宣传图：`docs/social/canvas-lab-x-promo-20260901.png`
+主宣传图（中文）：`docs/social/canvas-lab-x-promo-zh-20260901.png`
+
+英文备用图：`docs/social/canvas-lab-x-promo-20260901.png`
 
 ## 推荐推文（中文·增强版）
 
@@ -50,7 +52,7 @@ GitHub: https://github.com/deathcmd/Infinite-Canvas
 ## 发布步骤
 
 1. 在 X 新建帖子。
-2. 上传 `canvas-lab-x-promo-20260901.png`。
+2. 上传 `canvas-lab-x-promo-zh-20260901.png`（中文主图）。
 3. 粘贴上面的中文推文；如果面向海外读者，再使用 English alternative。
 4. 在图片的“添加描述”中粘贴 Alt text，方便读屏用户。
 5. 发布前检查链接是否为 `https://github.com/deathcmd/Infinite-Canvas`，不要把 `API/.env`、画布数据或个人素材作为附件上传。
