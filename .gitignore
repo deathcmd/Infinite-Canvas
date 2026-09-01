@@ -1,0 +1,95 @@
+# Local secrets and environment overrides.
+# Keep the example file tracked, but never commit a real environment file.
+API/.env
+API/.env.*
+.env
+.env.*
+*.env
+!.env.example
+
+# Runtime data and generated media.  These paths can contain user prompts,
+# uploaded files, model responses, and provider metadata.  Keep them local.
+/data/
+/assets/
+/output/
+/artifacts/
+data/
+assets/
+output/
+artifacts/
+*.log
+*.tmp
+*.bak
+
+# Local runtimes, virtual environments, and caches.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+node_modules/
+python/
+Infinite-Canvas-main/
+ref-xyq/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local attachments, browser sessions, and test reports.
+# Keep both spellings: the slash documents the directory, while the bare
+# name also blocks an accidentally created file with the same name.
+user_attachment/
+user_attachment
+user_attachment.*
+.playwright/
+playwright-report/
+test-results/
+.auth/
+storage-state*.json
+cookies*.json
+session*.json
+*.session
+*.sqlite
+*.sqlite3
+*.db
+
+# Local helper scripts, screenshots, and temporary review material.
+_run_*.cmd
+_patch_*.py
+_fix_*.py
+_write_*.py
+restore_core.py
+split_*.py
+trim_*.py
+polish_*.py
+build_sd25_canvas.py
+codex-check.png
+codex-clipboard-*.png
+qa-*.png
+screenshots/
+GROK-*.md
+CODEX-*.md
+!CODEX-XYQ-PLAN.md
+XYQ-REVIEW-REPORT.md
+xyq-spec.txt
+赞赏.png
+
+# Local legacy/demo exports.  Keep provider-specific or paid-era samples out
+# of a public release; the neutral migration fixture lives under static/ and
+# is covered by the open-source audit tests.
+/history.json
+/seedance25*.json
+/santi-*.json
+
+# RunningHub catalogs are user-edited provider state.  They may contain
+# private workflow IDs, temporary auth query strings, thumbnails, and other
+# account-specific metadata; the app falls back to neutral defaults when they
+# are absent from a clean checkout.
+/static/runninghub/api_providers.json
+/static/runninghub/thumbnails/
+
+# Editor and operating-system noise.
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

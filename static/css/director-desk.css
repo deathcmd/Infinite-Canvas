@@ -1,0 +1,335 @@
+/*
+ * Full-page director desk.
+ *
+ * The stage renderer remains shared with the canvas node; this file only
+ * supplies the page shell, responsive split panes and status affordances.
+ * Keeping the shell separate means the embedded canvas can keep its compact
+ * layout while a user gets a calm, distraction-free editing surface here.
+ */
+:root {
+    --director-bg: #edf2f0;
+    --director-panel: rgba(255, 255, 255, .94);
+    --director-line: #d7e1dc;
+    --director-ink: #14211f;
+    --director-muted: #64756f;
+    --director-accent: #0f766e;
+    --director-lime: #b8d66b;
+}
+
+html, body {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--director-bg);
+    color: var(--director-ink);
+    font-family: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
+}
+
+/* Author rules for the status cards intentionally use `display:flex`; keep
+   the HTML `hidden` contract stronger than that declaration so a dismissed
+   loading/error card cannot sit over the editor and intercept clicks. */
+.director-page [hidden] { display: none !important; }
+
+body.director-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.director-topbar {
+    z-index: 20;
+    flex: 0 0 68px;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--director-line);
+    background: var(--director-panel);
+    box-shadow: 0 5px 18px rgba(20, 33, 31, .08);
+    backdrop-filter: blur(14px);
+}
+
+.director-topbar-main,
+.director-topbar-actions,
+.director-brand {
+    display: flex;
+    align-items: center;
+}
+
+.director-topbar-main { min-width: 0; gap: 14px; }
+.director-topbar-actions { flex: 0 0 auto; gap: 8px; }
+.director-brand { flex: 0 0 auto; gap: 9px; }
+
+.director-brand-mark {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--director-accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: .08em;
+}
+
+.director-brand-name {
+    color: var(--director-ink);
+    font-size: 12px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.director-title-wrap {
+    min-width: 0;
+    padding-left: 14px;
+    border-left: 1px solid var(--director-line);
+}
+
+.director-title-wrap h1 {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--director-ink);
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -.015em;
+}
+
+.director-title-wrap p {
+    margin: 3px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--director-muted);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.director-back,
+.director-action {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    border: 1px solid var(--director-line);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .72);
+    color: var(--director-muted);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+.director-back:hover,
+.director-action:hover {
+    border-color: #9bcfc4;
+    background: #dff3ed;
+    color: var(--director-accent);
+    transform: translateY(-1px);
+}
+
+.director-back svg,
+.director-action svg { width: 15px; height: 15px; }
+
+.director-save-state {
+    min-width: 76px;
+    color: var(--director-muted);
+    font-size: 10px;
+    font-weight: 750;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.director-save-state[data-state="saving"] { color: #b45309; }
+.director-save-state[data-state="saved"] { color: #2f8f69; }
+.director-save-state[data-state="error"] { color: #b54a4a; }
+
+.director-main {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+#directorHost {
+    width: 100%;
+    height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#directorHost > .video-workflow-panel,
+#directorHost > .video-workflow-panel > .vwf-stage {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+}
+
+#directorHost > .video-workflow-panel > .vwf-stage {
+    border-radius: 14px;
+    border-color: var(--director-line);
+    box-shadow: 0 14px 38px rgba(20, 33, 31, .12);
+}
+
+.director-loading,
+.director-error {
+    position: absolute;
+    inset: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--director-line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .72);
+    color: var(--director-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.director-error {
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+.director-error strong { color: var(--director-ink); font-size: 14px; }
+.director-error span { max-width: 560px; line-height: 1.6; }
+.director-error button { margin-top: 4px; }
+
+.director-local-note {
+    position: static;
+    order: 0;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px 11px;
+    border: 1px solid rgba(184, 214, 107, .7);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .88);
+    color: #4d6521;
+    font-size: 10px;
+    font-weight: 750;
+    box-shadow: 0 8px 18px rgba(20, 33, 31, .1);
+    pointer-events: none;
+}
+
+.director-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    z-index: 150;
+    max-width: min(520px, calc(100vw - 32px));
+    padding: 10px 14px;
+    border: 1px solid var(--director-line);
+    border-radius: 10px;
+    background: var(--director-panel);
+    color: var(--director-ink);
+    box-shadow: 0 14px 32px rgba(20, 33, 31, .18);
+    font-size: 11px;
+    font-weight: 750;
+    opacity: 0;
+    transform: translate(-50%, 10px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.director-toast.is-on {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* The shared stage rules are intentionally desktop-first. On this page the
+   outer shell already owns the viewport, so keep the stage from introducing
+   a second page scrollbar at compact widths. */
+@media (max-width: 900px) {
+    .director-topbar { padding: 0 12px; gap: 10px; }
+    .director-main { padding: 10px; }
+    .director-brand-name { display: none; }
+    .director-save-state { min-width: 0; }
+    .director-back span,
+    .director-action span { display: none; }
+    .director-back,
+    .director-action { width: 34px; padding: 0; }
+}
+
+@media (max-width: 600px) {
+    .director-topbar {
+        flex-basis: 60px;
+        min-height: 60px;
+        padding: 0 8px;
+    }
+    .director-topbar-main { gap: 8px; }
+    .director-title-wrap { padding-left: 8px; }
+    .director-title-wrap h1 { font-size: 13px; }
+    .director-title-wrap p { font-size: 9px; }
+    .director-topbar-actions { gap: 4px; }
+    .director-save-state { display: none; }
+    .director-main { padding: 6px; }
+    #directorHost > .video-workflow-panel > .vwf-stage { border-radius: 10px; }
+    /* Keep the local-draft notice in normal flow.  An absolutely positioned
+       notice sat on top of the desk header/viewport on small screens,
+       obscuring the very controls needed to understand the current state. */
+    .director-main { gap: 5px; }
+    #directorHost { flex: 1 1 auto; height: auto; min-height: 0; }
+    .director-local-note {
+        position: static;
+        order: 0;
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        margin: 0;
+        /* Reserve the bottom-right contact launcher footprint; otherwise the
+           fixed launcher obscures the final words of this status message at
+           240px wide. */
+        padding: 6px 108px 6px 9px;
+        border-radius: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-shadow: none;
+    }
+}
+
+html.theme-dark,
+body.theme-dark {
+    --director-bg: #0e1714;
+    --director-panel: rgba(23, 35, 31, .96);
+    --director-line: #2f443d;
+    --director-ink: #e7f0eb;
+    --director-muted: #a7b9b1;
+    --director-accent: #44b7a9;
+}
+
+.theme-dark .director-back,
+.theme-dark .director-action,
+.theme-dark .director-loading,
+.theme-dark .director-error,
+.theme-dark .director-local-note,
+.theme-dark .director-toast {
+    background: rgba(23, 35, 31, .96);
+}
+
+.theme-dark .director-back:hover,
+.theme-dark .director-action:hover {
+    background: rgba(68, 183, 169, .16);
+}

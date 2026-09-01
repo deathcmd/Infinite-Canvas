@@ -1,0 +1,3329 @@
+/*
+ * LibTV-inspired desktop skin
+ * ----------------------------
+ * This is a presentation-only layer for the canvas surfaces.  It intentionally
+ * keeps the existing node/edge DOM and interaction contract intact while
+ * replacing the previous paper/green glass treatment with a restrained dark
+ * studio: dotted infinite workspace, compact floating chrome, quiet graphite
+ * edges, and a small cyan/purple state accent.
+ */
+
+:root {
+    --ltv-bg: #0b0d11;
+    --ltv-bg-elevated: #101318;
+    --ltv-panel: #14171e;
+    --ltv-panel-strong: #1f2229;
+    --ltv-panel-hover: #282d36;
+    --ltv-line: #262c37;
+    --ltv-line-soft: rgba(255, 255, 255, .085);
+    --ltv-line-strong: #3a4655;
+    --ltv-text: #f2f4f7;
+    --ltv-muted: #9199a6;
+    --ltv-faint: #667181;
+    --ltv-cyan: #09caf5;
+    --ltv-cyan-soft: rgba(9, 202, 245, .14);
+    --ltv-purple: #6f5cff;
+    --ltv-purple-soft: rgba(111, 92, 255, .18);
+    --ltv-ok: #7fd6a2;
+    --ltv-fail: #ff8792;
+    --ltv-run: #9fe7ff;
+    --ltv-shadow: rgba(0, 0, 0, .38);
+}
+
+/* Both classic and smart editors receive the class from libtv-skin.js.  Keep
+ * the declarations scoped so the project list/home pages retain their own
+ * brand language. */
+body.libtv-surface {
+    /* brand-theme.css still uses the --cl-* aliases for a few legacy
+       controls (tool buttons, upload rows and badges).  Keep those aliases
+       on the same graphite palette too; otherwise a hidden white rule can
+       leak back into the dark canvas when a node is opened or moved into
+       view. */
+    --cl-paper: var(--ltv-bg) !important;
+    --cl-panel: var(--ltv-panel) !important;
+    --cl-line: var(--ltv-line) !important;
+    --cl-line-strong: var(--ltv-line-strong) !important;
+    --cl-muted: var(--ltv-muted) !important;
+    --cl-faint: var(--ltv-faint) !important;
+    --cl-ink: var(--ltv-text) !important;
+    --cl-ink-2: #dce3ea !important;
+    --cl-teal: var(--ltv-cyan) !important;
+    --cl-teal-strong: #8feaff !important;
+    --cl-teal-soft: rgba(9, 202, 245, .12) !important;
+    --cl-lime: #b8d66b !important;
+    --cl-shadow: var(--ltv-shadow) !important;
+    --cl-shadow-strong: rgba(0, 0, 0, .58) !important;
+    --page: var(--ltv-bg) !important;
+    --panel: rgba(20, 23, 30, .96) !important;
+    --panel-solid: var(--ltv-panel) !important;
+    --card: var(--ltv-panel-strong) !important;
+    --card-solid: var(--ltv-panel-strong) !important;
+    --soft: #171b22 !important;
+    --soft-2: #1d232d !important;
+    --line: var(--ltv-line) !important;
+    --line-2: var(--ltv-line-strong) !important;
+    --text: var(--ltv-text) !important;
+    --muted: var(--ltv-muted) !important;
+    --faint: var(--ltv-faint) !important;
+    --shadow: var(--ltv-shadow) !important;
+    --shadow-strong: rgba(0, 0, 0, .58) !important;
+    --strong: var(--ltv-purple) !important;
+    --strong-text: #fff !important;
+    --accent: var(--ltv-cyan) !important;
+    --accent-soft: var(--ltv-cyan-soft) !important;
+    --accent-line: rgba(9, 202, 245, .46) !important;
+    --success: var(--ltv-ok) !important;
+    --danger: var(--ltv-fail) !important;
+    --danger-soft: rgba(255, 135, 146, .14) !important;
+    --grid: rgba(255, 255, 255, .045) !important;
+    color-scheme: dark;
+    color: var(--ltv-text) !important;
+    background: var(--ltv-bg) !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Keep the native scrollbar in the same graphite language as the canvas.
+ * Long home/tool documents still scroll, but their scrollbar should not
+ * re-introduce the bright paper-white strip the skin is replacing. */
+html:has(body.libtv-surface),
+body.libtv-surface {
+    scrollbar-color: #3a4352 #0b0d11;
+    scrollbar-width: thin;
+}
+
+html:has(body.libtv-surface)::-webkit-scrollbar,
+body.libtv-surface::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html:has(body.libtv-surface)::-webkit-scrollbar-track,
+body.libtv-surface::-webkit-scrollbar-track {
+    background: #0b0d11;
+}
+
+html:has(body.libtv-surface)::-webkit-scrollbar-thumb,
+body.libtv-surface::-webkit-scrollbar-thumb {
+    min-height: 34px;
+    border: 2px solid #0b0d11;
+    border-radius: 999px;
+    background: #3a4352;
+}
+
+html:has(body.libtv-surface)::-webkit-scrollbar-thumb:hover,
+body.libtv-surface::-webkit-scrollbar-thumb:hover {
+    background: #556276;
+}
+
+body.libtv-surface,
+body.libtv-surface button,
+body.libtv-surface input,
+body.libtv-surface select,
+body.libtv-surface textarea {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+body.libtv-surface ::selection {
+    color: #fff;
+    background: rgba(111, 92, 255, .58);
+}
+
+/* Chromium's default keyboard outline is almost black on the graphite
+ * surface, which makes stage controls appear to lose focus when navigating
+ * with Tab.  Keep the existing hit targets and interaction handlers, but
+ * give keyboard users a high-contrast LibTV accent ring. */
+body.libtv-surface :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--ltv-cyan) !important;
+    outline-offset: 2px;
+}
+
+body.libtv-surface .shell,
+body.libtv-surface .board {
+    background-color: var(--ltv-bg) !important;
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, .052) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, .018), transparent 32%);
+    background-size: 24px 24px, 100% 100%;
+}
+
+body.libtv-surface .shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 48%, rgba(0, 0, 0, .2) 100%);
+}
+
+body.libtv-surface .world,
+body.libtv-surface #board > .world {
+    color: var(--ltv-text);
+}
+
+/* The canvas manager has a project sidebar rather than the editor's fixed
+ * shell/rail.  Give that standalone route the same small project-owned
+ * identity lockup so the first thing a user sees is not an anonymous
+ * "项目" heading.  The data-brand attributes are hydrated by brand-ui.js,
+ * keeping this presentation in sync with the editor and contact surface. */
+body.libtv-surface .libtv-list-brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 72px;
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--ltv-line-soft);
+    color: var(--ltv-text);
+    background: linear-gradient(180deg, rgba(20, 23, 30, .98), rgba(20, 23, 30, .78));
+}
+
+body.libtv-surface .libtv-list-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(9, 202, 245, .42);
+    border-radius: 9px;
+    color: #06131a;
+    background: linear-gradient(145deg, #b8f3ff, #45d5ee 60%, #6f5cff);
+    box-shadow: 0 0 20px rgba(9, 202, 245, .25), inset 0 1px 0 rgba(255, 255, 255, .58);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .04em;
+}
+
+body.libtv-surface .libtv-list-brand-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.15;
+}
+
+body.libtv-surface .libtv-list-brand-copy strong {
+    overflow: hidden;
+    color: var(--ltv-text);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-list-brand-copy small {
+    color: var(--ltv-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    body.libtv-surface .libtv-list-brand-mark {
+        animation: libtvBrandPulse 5.8s ease-in-out infinite;
+    }
+}
+
+@keyframes libtvBrandPulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(9, 202, 245, .2), inset 0 1px 0 rgba(255, 255, 255, .58); }
+    50% { box-shadow: 0 0 26px rgba(9, 202, 245, .36), 0 0 0 3px rgba(111, 92, 255, .07), inset 0 1px 0 rgba(255, 255, 255, .68); }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Floating top chrome                                                        */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .smart-back,
+body.libtv-surface .smart-utility-strip > button,
+body.libtv-surface .canvas-nav,
+body.libtv-surface .toolbar {
+    color: var(--ltv-text) !important;
+    background: rgba(20, 23, 30, .92) !important;
+    border: 1px solid var(--ltv-line-soft) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .28) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+body.libtv-surface .smart-back {
+    left: 22px;
+    top: 20px;
+    height: 38px;
+    padding: 0 13px;
+    border-radius: 10px !important;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+body.libtv-surface .smart-back:hover {
+    color: #fff !important;
+    background: #252a32 !important;
+    border-color: rgba(255, 255, 255, .18) !important;
+    transform: translateY(-1px);
+}
+
+body.libtv-surface .smart-title {
+    left: 174px;
+    top: 31px;
+    color: var(--ltv-text) !important;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+body.libtv-surface .smart-title::before {
+    content: "";
+    display: inline-block;
+    width: 1px;
+    height: 15px;
+    margin-right: 13px;
+    vertical-align: -3px;
+    background: rgba(255, 255, 255, .22);
+}
+
+body.libtv-surface .smart-utility-strip {
+    top: 20px;
+    right: 20px;
+    gap: 3px;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(20, 23, 30, .92);
+    border: 1px solid var(--ltv-line-soft);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .28);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+body.libtv-surface .smart-utility-strip > button {
+    position: static !important;
+    width: auto !important;
+    min-width: 38px;
+    height: 31px;
+    padding: 0 9px;
+    gap: 6px;
+    border: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+body.libtv-surface .smart-utility-strip > button:hover,
+body.libtv-surface .smart-utility-strip > button.active {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .smart-utility-strip > button.active {
+    box-shadow: inset 0 0 0 1px rgba(9, 202, 245, .35) !important;
+}
+
+body.libtv-surface .smart-utility-strip svg {
+    color: var(--ltv-muted);
+    width: 15px;
+    height: 15px;
+}
+
+body.libtv-surface .smart-utility-strip > button:hover svg,
+body.libtv-surface .smart-utility-strip > button.active svg {
+    color: var(--ltv-cyan);
+}
+
+/* Classic canvas has the same two controls but they live in .topbar. */
+body.libtv-surface .topbar {
+    top: 16px;
+    left: 18px;
+    right: 18px;
+}
+
+body.libtv-surface .canvas-nav,
+body.libtv-surface .toolbar {
+    border-radius: 11px !important;
+}
+
+body.libtv-surface .canvas-nav {
+    padding: 7px 10px 7px 7px;
+}
+
+body.libtv-surface .canvas-nav .tool-btn,
+body.libtv-surface .toolbar .tool-btn {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+body.libtv-surface .canvas-nav .tool-btn:hover,
+body.libtv-surface .toolbar .tool-btn:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .current-canvas-title,
+body.libtv-surface .ws-board-name {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .current-canvas-time {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .toolbar-run,
+body.libtv-surface .run-btn,
+body.libtv-surface .gen-btn,
+body.libtv-surface .comfy-run,
+body.libtv-surface .llm-run {
+    background: var(--ltv-purple) !important;
+    border-color: var(--ltv-purple) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 22px rgba(111, 92, 255, .24) !important;
+}
+
+body.libtv-surface .toolbar-run:hover,
+body.libtv-surface .run-btn:hover,
+body.libtv-surface .gen-btn:hover,
+body.libtv-surface .comfy-run:hover,
+body.libtv-surface .llm-run:hover {
+    background: #8172ff !important;
+    border-color: #8172ff !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* LibTV-like vertical tool rail (created by libtv-skin.js)                  */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .libtv-rail {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    z-index: 60;
+    width: 54px;
+    padding: 7px 6px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--ltv-line-soft);
+    border-radius: 12px;
+    background: rgba(31, 34, 40, .94);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .36);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+body.libtv-surface .libtv-rail-btn {
+    position: relative;
+    width: 42px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9px;
+    color: #b8c0cc;
+    background: transparent;
+    cursor: pointer;
+    transition: color .16s ease, background .16s ease, transform .16s ease;
+}
+
+body.libtv-surface .libtv-rail-btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+body.libtv-surface .libtv-rail-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke-width: 1.8;
+}
+
+body.libtv-surface .libtv-rail-btn:first-of-type {
+    margin-bottom: 4px;
+    color: #111318;
+    background: #f1f3f5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+}
+
+body.libtv-surface .libtv-rail-btn:hover {
+    color: #fff;
+    background: var(--ltv-panel-hover);
+    transform: translateY(-1px);
+}
+
+body.libtv-surface .libtv-rail-btn.active {
+    color: #fff;
+    background: var(--ltv-purple);
+    box-shadow: 0 6px 16px rgba(111, 92, 255, .28);
+}
+
+body.libtv-surface .libtv-rail-btn::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 9px);
+    top: 50%;
+    z-index: 4;
+    padding: 5px 8px;
+    border: 1px solid var(--ltv-line-soft);
+    border-radius: 6px;
+    color: var(--ltv-text);
+    background: #1b1f26;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .34);
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-4px, -50%);
+    transition: opacity .14s ease, transform .14s ease;
+}
+
+body.libtv-surface .libtv-rail-btn:hover::after,
+body.libtv-surface .libtv-rail-btn:focus-visible::after {
+    opacity: 1;
+    transform: translate(0, -50%);
+}
+
+body.libtv-surface .libtv-rail-separator {
+    width: 28px;
+    height: 1px;
+    margin: 3px 0 4px;
+    background: rgba(255, 255, 255, .1);
+}
+
+body.libtv-surface .libtv-connect-hint {
+    position: absolute;
+    left: 84px;
+    top: calc(50% + 116px);
+    z-index: 61;
+    max-width: 320px;
+    padding: 8px 11px;
+    border: 1px solid rgba(9, 202, 245, .28);
+    border-radius: 8px;
+    color: #c8f5ff;
+    background: rgba(13, 26, 32, .92);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .3);
+    font-size: 10.5px;
+    font-weight: 650;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(5px);
+    transition: opacity .16s ease, transform .16s ease;
+}
+
+body.libtv-surface .libtv-connect-hint.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+body.libtv-surface.libtv-connect-mode .node-port,
+body.libtv-surface.libtv-connect-mode .port {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    box-shadow: 0 0 0 3px rgba(9, 202, 245, .16), 0 0 14px rgba(9, 202, 245, .5) !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Nodes and media cards                                                      */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .image-node.group-node {
+    padding: 12px !important;
+    border: 1px solid transparent !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+body.libtv-surface .image-node.group-node:hover,
+body.libtv-surface .image-node.group-node.selected {
+    border-color: rgba(111, 92, 255, .42) !important;
+    box-shadow: 0 0 0 1px rgba(111, 92, 255, .22) !important;
+}
+
+body.libtv-surface .thumb-grid {
+    gap: 9px !important;
+    scrollbar-color: rgba(255, 255, 255, .2) transparent !important;
+}
+
+body.libtv-surface .thumb-item {
+    border: 1px solid rgba(255, 255, 255, .11) !important;
+    border-radius: 8px !important;
+    background: #1c2026 !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .28) !important;
+}
+
+body.libtv-surface .thumb-item:hover,
+body.libtv-surface .thumb-item.image-selected {
+    border-color: var(--ltv-cyan) !important;
+    box-shadow: 0 0 0 1px rgba(9, 202, 245, .26), 0 10px 22px rgba(0, 0, 0, .4) !important;
+}
+
+body.libtv-surface .thumb-item img,
+body.libtv-surface .image-wrap > img,
+body.libtv-surface .image-wrap > .media-video-card,
+body.libtv-surface .node-img {
+    border-radius: 8px !important;
+    border-color: rgba(255, 255, 255, .11) !important;
+    background: #0e1116 !important;
+}
+
+body.libtv-surface .image-name-badge,
+body.libtv-surface .image-name-badge.image-name-badge-outside {
+    color: #929aa6 !important;
+    font-size: 9.5px !important;
+    text-shadow: none !important;
+}
+
+body.libtv-surface .image-name-badge:hover {
+    color: #e3e7ec !important;
+}
+
+body.libtv-surface .image-node.prompt-smart-node,
+body.libtv-surface .image-node.loop-smart-node,
+body.libtv-surface .image-node.minimax-smart-node,
+body.libtv-surface .image-node.empty-node {
+    border: 1px solid var(--ltv-line) !important;
+    border-radius: 10px !important;
+    background: rgba(20, 23, 30, .97) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .34) !important;
+    backdrop-filter: none !important;
+}
+
+body.libtv-surface .prompt-node-text,
+body.libtv-surface .prompt-node-pill,
+body.libtv-surface .prompt-node-split-control,
+body.libtv-surface .prompt-node-llm select,
+body.libtv-surface .prompt-node-llm textarea,
+body.libtv-surface .loop-number-trigger,
+body.libtv-surface .node-drop {
+    color: var(--ltv-text) !important;
+    background: #0f1217 !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: none !important;
+}
+
+body.libtv-surface .prompt-node-text::placeholder,
+body.libtv-surface .prompt-node-llm textarea::placeholder {
+    color: #687384 !important;
+}
+
+body.libtv-surface .node-port {
+    background: #11151b !important;
+    border-color: var(--ltv-cyan) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .4) !important;
+}
+
+body.libtv-surface .node-port:hover,
+body.libtv-surface .node-port.is-active {
+    background: var(--ltv-cyan) !important;
+    border-color: #c9f7ff !important;
+}
+
+body.libtv-surface .smart-node-floating-menu,
+body.libtv-surface .floating-node-actions {
+    background: rgba(24, 28, 35, .96) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .42) !important;
+    backdrop-filter: none !important;
+}
+
+body.libtv-surface .smart-node-floating-menu button,
+body.libtv-surface .floating-node-actions button {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .smart-node-floating-menu button:hover,
+body.libtv-surface .floating-node-actions button:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .mini-x,
+body.libtv-surface .node-resize-handle {
+    color: #aeb7c3 !important;
+    background: rgba(20, 23, 30, .94) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .35) !important;
+}
+
+/* Classic nodes use the same graphite material. */
+body.libtv-surface .node {
+    border-color: var(--ltv-line) !important;
+    border-radius: 10px !important;
+    background: var(--ltv-panel) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .36) !important;
+}
+
+body.libtv-surface .node::before {
+    border-radius: inherit;
+    background: var(--ltv-panel) !important;
+}
+
+body.libtv-surface .node-head {
+    border-radius: 10px 10px 0 0 !important;
+    border-bottom-color: var(--ltv-line) !important;
+    background: #181b21 !important;
+}
+
+body.libtv-surface .node-title {
+    color: var(--ltv-text) !important;
+    letter-spacing: .04em !important;
+}
+
+body.libtv-surface .node-body {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .node.selected {
+    outline: 1px solid var(--ltv-purple) !important;
+    outline-offset: 3px;
+}
+
+body.libtv-surface .node.sized.image-node .node-body,
+body.libtv-surface .node.sized.video-node .node-body,
+body.libtv-surface .node.sized.generator-node .node-body {
+    background: var(--ltv-panel) !important;
+}
+
+body.libtv-surface .node textarea,
+body.libtv-surface .node input,
+body.libtv-surface .node select {
+    color: var(--ltv-text) !important;
+    background: #0f1217 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Menus, composer, asset drawer and minimap                                  */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .create-menu,
+body.libtv-surface .workflow-transfer-panel,
+body.libtv-surface .asset-panel,
+body.libtv-surface .canvas-asset-panel,
+body.libtv-surface .log-panel,
+body.libtv-surface .shortcut-panel,
+body.libtv-surface .prompt-template-panel,
+body.libtv-surface .prompt-preset-panel,
+body.libtv-surface .image-edit-panel,
+body.libtv-surface .output-lightbox-shell,
+body.libtv-surface .composer-card {
+    color: var(--ltv-text) !important;
+    background: rgba(20, 23, 30, .98) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 22px 58px rgba(0, 0, 0, .52) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+body.libtv-surface .create-card,
+body.libtv-surface .workflow-transfer-card,
+body.libtv-surface .asset-item,
+body.libtv-surface .canvas-asset-item {
+    color: var(--ltv-text) !important;
+    background: #1c2027 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .create-card:hover,
+body.libtv-surface .workflow-transfer-card:hover,
+body.libtv-surface .asset-item:hover,
+body.libtv-surface .canvas-asset-item:hover {
+    border-color: rgba(9, 202, 245, .5) !important;
+    background: #242a33 !important;
+}
+
+/* The classic editor uses compact .menu-btn rows instead of smart editor
+ * cards.  Its legacy slate token is too dim on LibTV's graphite surface;
+ * keep the same hit targets while giving labels/icons a readable hierarchy. */
+body.libtv-surface .create-menu .menu-section-title {
+    color: var(--ltv-faint) !important;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+body.libtv-surface .create-menu .menu-btn {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    border-radius: 8px !important;
+    transition: color .14s ease, background .14s ease, transform .14s ease;
+}
+
+body.libtv-surface .create-menu .menu-btn:hover,
+body.libtv-surface .create-menu .menu-btn:focus-visible {
+    color: var(--ltv-text) !important;
+    background: var(--ltv-panel-hover) !important;
+    transform: translateX(1px);
+}
+
+body.libtv-surface .create-menu .menu-btn svg,
+body.libtv-surface .create-menu .menu-btn i {
+    color: var(--ltv-cyan) !important;
+}
+
+body.libtv-surface .create-menu .menu-divider {
+    background: var(--ltv-line) !important;
+}
+
+body.libtv-surface .create-card-icon,
+body.libtv-surface .asset-tab,
+body.libtv-surface .asset-category-select,
+body.libtv-surface .asset-library-select,
+body.libtv-surface .canvas-asset-select {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .create-card-title,
+body.libtv-surface .asset-title,
+body.libtv-surface .workflow-transfer-title,
+body.libtv-surface .log-title,
+body.libtv-surface .shortcut-title {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .create-card-sub,
+body.libtv-surface .workflow-transfer-card p,
+body.libtv-surface .asset-drop-zone,
+body.libtv-surface .workflow-transfer-sub {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .smart-minimap,
+body.libtv-surface .minimap {
+    width: 164px !important;
+    height: 108px !important;
+    border-radius: 10px !important;
+    background: rgba(20, 23, 30, .92) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .42) !important;
+    backdrop-filter: none !important;
+}
+
+body.libtv-surface .smart-minimap-content,
+body.libtv-surface .minimap-content {
+    background-color: #0f1217 !important;
+    background-image: radial-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px) !important;
+}
+
+body.libtv-surface .minimap-arrange-btn,
+body.libtv-surface .minimap-delete-btn {
+    color: var(--ltv-muted) !important;
+    background: #1a1e25 !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .34) !important;
+}
+
+body.libtv-surface .minimap-arrange-btn:hover,
+body.libtv-surface .minimap-delete-btn:hover {
+    color: #fff !important;
+    background: #262c36 !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Connections: graphite base with a readable liquid signal.  The base stays
+   restrained so cards remain the focus, while the continuous paint passes
+   are deliberately bright enough to survive a zoomed-out desktop board. */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .connection-layer .conn-line:not(.conn-pending):not(.conn-cascade-active):not(.conn-selected) {
+    stroke: #3f7185 !important;
+    opacity: .74 !important;
+    filter: drop-shadow(0 0 1.5px rgba(9, 202, 245, .18)) !important;
+    animation: none !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-glow {
+    /* Keep the gradient paint from motion-effects.css. A flat gray override
+       makes the liquid layer read like a plastic wire and hides the moving
+       sheen that gives LibTV its depth. */
+    stroke: var(--conn-flow-gradient, var(--ltv-cyan)) !important;
+    stroke-width: 11px !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .18 !important;
+    filter: drop-shadow(0 0 5px var(--conn-flow-shadow, rgba(9, 202, 245, .46))) blur(.35px) !important;
+    animation: libtvFluidGlow 3.8s ease-in-out infinite !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow {
+    stroke: var(--conn-flow-gradient, #2dd4bf) !important;
+    stroke-width: 4.2px !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: var(--conn-flow-opacity, .94) !important;
+    filter: drop-shadow(0 0 4px var(--conn-flow-shadow, rgba(20, 184, 166, .82))) !important;
+    animation: libtvFluidBody 5.2s ease-in-out infinite !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-core {
+    stroke: var(--conn-flow-core-color, #e6fffb) !important;
+    stroke-width: 1.3px !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .54 !important;
+    filter: drop-shadow(0 0 3px var(--conn-flow-shadow, rgba(20, 184, 166, .82))) !important;
+    animation: libtvFluidCore 5.2s ease-in-out infinite !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-dense {
+    stroke: var(--conn-flow-gradient, #2dd4bf) !important;
+    stroke-width: 3.2px !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .64 !important;
+    filter: drop-shadow(0 0 3.5px var(--conn-flow-shadow, rgba(20, 184, 166, .78))) !important;
+    animation: libtvFluidDense 5.6s ease-in-out infinite !important;
+}
+
+/* Dense mode keeps every base path and hit target available for selection,
+   deletion and keyboard navigation, but the base wire is deliberately quiet.
+   The bounded aggregate tube above carries the animated liquid sheen; without
+   this veil a 500-edge storyboard becomes a bright wall of overlapping lines
+   that obscures cards and no longer resembles a calm LibTV workspace. */
+    body.libtv-surface .connection-layer.conn-dense-motion .conn-line:not(.conn-selected):not(.conn-pending) {
+        stroke: #3b4654 !important;
+        /* Dense boards keep their individual hit paths, but the aggregate
+           tubes below are the visual material.  A near-whisper base veil
+           preserves topology without turning a 500-edge storyboard into a
+           luminous wall. */
+        opacity: .055 !important;
+        filter: none !important;
+    }
+    body.libtv-surface .connection-layer.conn-dense-motion .conn-end:not(.conn-selected) {
+        opacity: .12 !important;
+    }
+    body.libtv-surface .connection-layer.conn-dense-motion .conn-cut:not(.conn-selected) {
+        opacity: .05 !important;
+    }
+
+/* Aggregate paths use a few restrained sheen/streak highlights per material.
+   The normal dense-mode rule in motion-effects.css hides per-edge highlights;
+   this opt-in class is the intentionally cheap replacement and remains
+   paint-only. */
+body.libtv-surface .connection-layer .conn-flow-dense-spark {
+    display: inline !important;
+    opacity: .84 !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-dense-input {
+    stroke: var(--conn-flow-gradient, #38bdf8) !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-dense-cascade {
+    stroke: var(--conn-flow-gradient, var(--ltv-ok)) !important;
+    opacity: .78 !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-dense-history {
+    stroke: var(--conn-flow-gradient, #94a3b8) !important;
+    opacity: .58 !important;
+}
+
+body.libtv-surface .connection-layer .conn-input .conn-flow,
+body.libtv-surface .connection-layer .conn-input.conn-flow {
+    stroke: var(--conn-flow-gradient, #38bdf8) !important;
+}
+
+body.libtv-surface .connection-layer .conn-output .conn-flow,
+body.libtv-surface .connection-layer .conn-output.conn-flow {
+    stroke: var(--conn-flow-gradient, #2dd4bf) !important;
+}
+
+body.libtv-surface .connection-layer .conn-history .conn-flow,
+body.libtv-surface .connection-layer .conn-history.conn-flow {
+    stroke: var(--conn-flow-gradient, #94a3b8) !important;
+    opacity: .66 !important;
+}
+
+/* smart-canvas.css uses a dash pattern for historical wires. Keep that
+   distinction in metadata/state, not in the paint: idle history remains a
+   continuous cable and only pending/active-run states may be segmented. */
+body.libtv-surface .connection-layer .conn-line.conn-history:not(.conn-pending):not(.conn-cascade-active),
+body.libtv-surface .connection-layer .conn-flow.conn-history,
+body.libtv-surface .connection-layer .conn-flow-core.conn-history,
+body.libtv-surface .connection-layer .conn-flow-glow.conn-history {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-spark {
+    opacity: .96 !important;
+    transform: scale(1);
+}
+
+/* The travelling highlight is an elongated, low-contrast sheen.  Keep it
+   slow enough to read as liquid and avoid the old round “dot” treatment. */
+body.libtv-surface .connection-layer .conn-flow-spark-sheen {
+    opacity: .44 !important;
+    filter: drop-shadow(0 0 7px rgba(9, 202, 245, .68)) blur(.8px) !important;
+    animation: libtvFluidSheen 2.6s ease-in-out infinite !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-spark-streak {
+    opacity: .68 !important;
+    filter: drop-shadow(0 0 4px rgba(9, 202, 245, .72)) !important;
+}
+
+/* Keep a stale cached renderer from resurrecting round dots or star flares;
+   the current skin intentionally paints only elongated sheen/streak ellipses. */
+body.libtv-surface .connection-layer .conn-flow-spark > circle,
+body.libtv-surface .connection-layer .conn-flow-spark > path {
+    display: none !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-spark-halo {
+    opacity: .28 !important;
+    filter: drop-shadow(0 0 6px rgba(9, 202, 245, .68)) !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-spark-core {
+    opacity: .96 !important;
+    filter: drop-shadow(0 0 4px rgba(9, 202, 245, .82)) !important;
+}
+
+body.libtv-surface .connection-layer .conn-flow-spark-flare,
+body.libtv-surface .connection-layer .conn-flow-spark-star {
+    opacity: .98 !important;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, .92)) !important;
+}
+
+body.libtv-surface .connection-layer .conn-cascade-active .conn-flow,
+body.libtv-surface .connection-layer .conn-cascade-active.conn-flow {
+    stroke: var(--ltv-ok) !important;
+    opacity: .92 !important;
+    filter: drop-shadow(0 0 2px rgba(127, 214, 162, .42)) !important;
+}
+
+body.libtv-surface .connection-layer .conn-selected,
+body.libtv-surface .connection-layer .conn-flow.conn-selected,
+body.libtv-surface .connection-layer .conn-flow-core.conn-selected {
+    stroke: var(--ltv-purple) !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 4px rgba(111, 92, 255, .55)) !important;
+}
+
+body.libtv-surface .connection-layer .conn-pending {
+    stroke: #697486 !important;
+    opacity: .6 !important;
+}
+
+body.libtv-surface .connection-layer .conn-end {
+    fill: #748291 !important;
+    opacity: .72 !important;
+}
+
+body.libtv-surface .connection-layer .conn-end-halo {
+    stroke: var(--ltv-cyan) !important;
+    opacity: .16 !important;
+}
+
+/* Classic SVG layer uses the same material names with a .link prefix. */
+body.libtv-surface #links .link:not(.temp):not(.knife-trail):not(.link-active) {
+    stroke: #4b5664 !important;
+    opacity: .62 !important;
+    filter: none !important;
+}
+
+body.libtv-surface #links .link-motion-glow {
+    stroke: url(#canvas-link-gradient) !important;
+    stroke-width: 10 !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .14 !important;
+    filter: drop-shadow(0 0 7px rgba(9, 202, 245, .6)) blur(.35px) !important;
+    animation: libtvFluidGlow 3.8s ease-in-out infinite !important;
+}
+
+body.libtv-surface #links .link-motion-flow {
+    stroke: url(#canvas-link-gradient) !important;
+    stroke-width: 4.2 !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .94 !important;
+    filter: drop-shadow(0 0 4px rgba(20, 184, 166, .82)) !important;
+    animation: libtvFluidBody 5.2s ease-in-out infinite !important;
+}
+
+body.libtv-surface #links .link-motion-core {
+    stroke: #e6fffb !important;
+    stroke-width: 1.3 !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .54 !important;
+    filter: drop-shadow(0 0 3px rgba(20, 184, 166, .82)) !important;
+    animation: libtvFluidCore 5.2s ease-in-out infinite !important;
+}
+
+body.libtv-surface #links .link-motion-spark {
+    opacity: .96 !important;
+    transform: scale(1);
+}
+body.libtv-surface #links .link-motion-spark-sheen {
+    opacity: .44 !important;
+    filter: drop-shadow(0 0 7px rgba(9, 202, 245, .68)) blur(.8px) !important;
+    animation: libtvFluidSheen 2.6s ease-in-out infinite !important;
+}
+
+body.libtv-surface #links .link-motion-spark > circle,
+body.libtv-surface #links .link-motion-spark > path {
+    display: none !important;
+}
+
+body.libtv-surface #links .link-motion-spark-halo {
+    opacity: .28 !important;
+    filter: drop-shadow(0 0 6px rgba(9, 202, 245, .68)) !important;
+}
+
+body.libtv-surface #links .link-motion-spark-core {
+    opacity: .96 !important;
+    filter: drop-shadow(0 0 4px rgba(9, 202, 245, .82)) !important;
+}
+
+body.libtv-surface #links .link-motion-spark-flare,
+body.libtv-surface #links .link-motion-spark-star {
+    opacity: .98 !important;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, .92)) !important;
+}
+
+body.libtv-surface #links .link-motion-flow.link-active,
+body.libtv-surface #links .link-motion-core.link-active {
+    stroke: var(--ltv-ok) !important;
+    opacity: .9 !important;
+}
+
+body.libtv-surface #links .link-motion-flow.link-hovered,
+body.libtv-surface #links .link-motion-core.link-hovered {
+    stroke: var(--ltv-purple) !important;
+    opacity: 1 !important;
+}
+
+body.libtv-surface #links .link-hit,
+body.libtv-surface .connection-layer .conn-hit {
+    stroke: transparent !important;
+    pointer-events: stroke !important;
+}
+
+body.libtv-surface .connection-layer.conn-dense-motion .conn-flow,
+body.libtv-surface .connection-layer.conn-dense-motion .conn-flow-glow,
+body.libtv-surface .connection-layer.conn-dense-motion .conn-flow-core,
+body.libtv-surface .connection-layer.conn-dense-motion .conn-flow-spark {
+    animation: none !important;
+}
+/* Dense mode hides per-edge highlights, but keeps the small number of aggregate
+   paths alive. Their animated gradient is the cheap, continuous fluid cue for
+   large storyboards; disabling it made a busy canvas look completely frozen. */
+body.libtv-surface .connection-layer.conn-dense-motion .conn-flow-dense {
+     animation: libtvFluidDense 5.6s ease-in-out infinite !important;
+}
+
+body.libtv-surface .connection-layer.conn-reduce-motion .conn-flow-dense {
+    animation: none !important;
+}
+body.libtv-surface .connection-layer.conn-reduce-motion .conn-flow-dense-spark {
+    display: none !important;
+}
+
+@keyframes libtvFluidGlow {
+    0%, 100% { opacity: .10; }
+    50% { opacity: .22; }
+}
+
+@keyframes libtvFluidBody {
+    0%, 100% { opacity: .72; }
+    50% { opacity: .98; }
+}
+
+@keyframes libtvFluidCore {
+    0%, 100% { opacity: .32; }
+    50% { opacity: .60; }
+}
+
+@keyframes libtvFluidDense {
+    /* Dense aggregate tubes are intentionally quieter than ordinary links;
+       the small moving sheen/streak highlights provide the high-contrast glint. */
+    0%, 100% { opacity: .48; }
+    38% { opacity: .68; }
+    54% { opacity: .56; }
+    72% { opacity: .72; }
+}
+
+@keyframes libtvFluidSheen {
+    0%, 100% { opacity: .18; transform: scaleX(.72); }
+    50% { opacity: .56; transform: scaleX(1.08); }
+}
+
+/* Hover/selected edge controls are intentionally small and dark instead of
+ * the previous white “floating x” chips. */
+body.libtv-surface .connection-layer .conn-cut,
+body.libtv-surface .link-delete {
+    color: var(--ltv-muted) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .42) !important;
+}
+
+body.libtv-surface .connection-layer .conn-cut:hover,
+body.libtv-surface .link-delete:hover {
+    color: var(--ltv-fail) !important;
+    background: #292028 !important;
+    border-color: rgba(255, 135, 146, .42) !important;
+}
+
+/* Keep the explicit reduced-motion contract stronger than this skin. */
+@media (prefers-reduced-motion: reduce) {
+    body.libtv-surface .connection-layer .conn-flow,
+    body.libtv-surface .connection-layer .conn-flow-glow,
+    body.libtv-surface .connection-layer .conn-flow-core,
+    body.libtv-surface .connection-layer .conn-flow-spark,
+    body.libtv-surface .connection-layer .conn-flow-dense-spark,
+    body.libtv-surface #links .link-motion-flow,
+    body.libtv-surface #links .link-motion-glow,
+    body.libtv-surface #links .link-motion-core,
+    body.libtv-surface #links .link-motion-spark {
+        animation: none !important;
+    }
+    body.libtv-surface .connection-layer .conn-flow-spark,
+    body.libtv-surface .connection-layer .conn-flow-dense-spark,
+    body.libtv-surface #links .link-motion-spark {
+        display: none !important;
+    }
+}
+
+/* LibTV's editor reads as a framed studio rather than a white application
+ * page.  On the desktop target keep a slim atmospheric border around the
+ * infinite canvas; the world itself remains full-size and all pointer
+ * coordinates are still resolved from the shell's client rect.  The rule is
+ * deliberately limited to canvas editors (not the list or standalone desk)
+ * so dialogs that are reparented to <body> keep their existing geometry. */
+@media (min-width: 901px) {
+    html {
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Only the two node editors own the framed, fixed viewport.  The old
+       broad :not(.director-page) selector also caught home/list documents,
+       which made a direct home.html load clip its lower project cards.  Use
+       the class the skin adds to the actual editor shell instead. */
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) {
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 8% 0%, rgba(18, 70, 82, .72), transparent 30%),
+            radial-gradient(circle at 96% 100%, rgba(31, 48, 80, .4), transparent 34%),
+            #071014 !important;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell {
+        position: absolute !important;
+        inset: 12px !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        border: 1px solid rgba(106, 211, 229, .25) !important;
+        border-radius: 18px !important;
+        box-shadow:
+            0 24px 72px rgba(0, 0, 0, .56),
+            0 0 0 1px rgba(255, 255, 255, .035) !important;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell::after {
+        border-radius: inherit;
+    }
+
+    /* Standalone landing/list documents remain scrollable inside the root
+       launcher iframe.  The outer index shell is still fixed; only the
+       document that owns the long content gets a vertical scrollbar. */
+    html:has(body.libtv-surface.home-libtv),
+    html:has(body.libtv-surface .workspace) {
+        height: auto !important;
+        min-height: 100% !important;
+        overflow-y: auto !important;
+    }
+
+    body.libtv-surface.home-libtv,
+    body.libtv-surface:has(.workspace) {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+    }
+}
+
+@media (max-width: 760px) {
+    /* The product is desktop-first, but keeping the rail compact avoids an
+     * accidental horizontal scrollbar if a developer opens it on a narrow
+     * viewport. */
+    body.libtv-surface .libtv-rail {
+        left: 8px;
+        transform: translateY(-50%) scale(.9);
+        transform-origin: left center;
+    }
+    body.libtv-surface .smart-title { left: 58px; top: 78px; }
+    body.libtv-surface .smart-title::before { display: none; }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Project/canvas list                                                        */
+/* ------------------------------------------------------------------------- */
+
+body.libtv-surface .workspace {
+    background: var(--ltv-bg) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .ws-sidebar {
+    flex-basis: 232px;
+    width: 232px;
+    background: #121419 !important;
+    border-right: 1px solid var(--ltv-line) !important;
+    box-shadow: 12px 0 32px rgba(0, 0, 0, .24) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .ws-side-title,
+body.libtv-surface .ws-board-name,
+body.libtv-surface .ws-side-head,
+body.libtv-surface .ws-trash-head-title {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .ws-side-add,
+body.libtv-surface .ws-icon-btn,
+body.libtv-surface .ws-bulk-btn,
+body.libtv-surface .ws-mini-btn {
+    color: var(--ltv-muted) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .ws-side-add:hover,
+body.libtv-surface .ws-icon-btn:hover,
+body.libtv-surface .ws-bulk-btn:hover:not(:disabled),
+body.libtv-surface .ws-mini-btn:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface .ws-project-row,
+body.libtv-surface .ws-trash-entry {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .ws-project-row:hover,
+body.libtv-surface .ws-trash-entry:hover {
+    color: #fff !important;
+    background: #1c2129 !important;
+}
+
+body.libtv-surface .ws-project-row.active {
+    color: #fff !important;
+    background: rgba(111, 92, 255, .76) !important;
+    box-shadow: 0 8px 20px rgba(111, 92, 255, .22) !important;
+}
+
+body.libtv-surface .ws-project-name,
+body.libtv-surface .ws-project-icon,
+body.libtv-surface .ws-project-count,
+body.libtv-surface .ws-trash-label {
+    color: inherit !important;
+}
+
+body.libtv-surface .ws-project-count {
+    background: rgba(255, 255, 255, .1) !important;
+}
+
+body.libtv-surface .ws-main,
+body.libtv-surface .ws-topbar,
+body.libtv-surface .ws-bulk-toolbar {
+    background: #0f1217 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .ws-topbar {
+    min-height: 62px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18) !important;
+}
+
+body.libtv-surface .ws-board {
+    background-color: var(--ltv-bg) !important;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, .052) 1px, transparent 1px) !important;
+    background-size: 24px 24px !important;
+}
+
+body.libtv-surface .ws-primary-btn {
+    background: var(--ltv-purple) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(111, 92, 255, .24) !important;
+}
+
+body.libtv-surface .ws-primary-btn:hover {
+    background: #8172ff !important;
+}
+
+body.libtv-surface .ws-paste-btn {
+    background: #0b90af !important;
+    border-color: rgba(159, 231, 255, .26) !important;
+}
+
+body.libtv-surface .ws-card,
+body.libtv-surface .ws-trash-card,
+body.libtv-surface .ws-card-pop,
+body.libtv-surface .ws-create-card,
+body.libtv-surface .ws-bulk-dialog-card {
+    color: var(--ltv-text) !important;
+    background: var(--ltv-panel) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .34) !important;
+}
+
+body.libtv-surface .ws-card:hover,
+body.libtv-surface .ws-card.selected {
+    border-color: rgba(9, 202, 245, .5) !important;
+    box-shadow: 0 0 0 1px rgba(9, 202, 245, .2), 0 16px 32px rgba(0, 0, 0, .4) !important;
+}
+
+body.libtv-surface .ws-card-title,
+body.libtv-surface .ws-card-time,
+body.libtv-surface .ws-card-nodes,
+body.libtv-surface .ws-card-meta,
+body.libtv-surface .ws-board-empty-text {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .ws-card-meta {
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .ws-card-kind.smart {
+    color: #c8f5ff !important;
+    background: rgba(9, 202, 245, .12) !important;
+    border-color: rgba(9, 202, 245, .28) !important;
+}
+
+body.libtv-surface .ws-card-kind.classic {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .ws-board-empty-sub,
+body.libtv-surface .ws-bulk-summary,
+body.libtv-surface .ws-trash-note {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .ws-board-empty-icon {
+    color: var(--ltv-cyan) !important;
+    background: var(--ltv-panel) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .36) !important;
+}
+
+body.libtv-surface .ws-trash-panel {
+    background: var(--ltv-bg) !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Director desk surfaces                                                     */
+/* ------------------------------------------------------------------------- */
+
+/* The director desk is mounted by the same workflow panel inside a canvas,
+ * in the standalone director page, and in the smoke harness.  Keep this
+ * block scoped to the LibTV skin so the existing light theme remains
+ * available when the class is omitted.  No canvas/Three.js behaviour is
+ * changed here; only the chrome surrounding the render surfaces is themed. */
+body.libtv-surface.director-page {
+    --director-bg: var(--ltv-bg) !important;
+    --director-panel: rgba(20, 23, 30, .96) !important;
+    --director-line: var(--ltv-line) !important;
+    --director-ink: var(--ltv-text) !important;
+    --director-muted: var(--ltv-muted) !important;
+    --director-accent: var(--ltv-cyan) !important;
+    --director-lime: var(--ltv-purple) !important;
+    background: var(--ltv-bg) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.director-page .director-topbar {
+    background: rgba(15, 18, 23, .94) !important;
+    border-bottom-color: var(--ltv-line) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .28) !important;
+}
+
+body.libtv-surface.director-page .director-back,
+body.libtv-surface.director-page .director-action {
+    color: var(--ltv-muted) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.director-page .director-back:hover,
+body.libtv-surface.director-page .director-action:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface.director-page .director-brand-mark {
+    background: var(--ltv-purple) !important;
+    color: #fff !important;
+    box-shadow: 0 5px 14px rgba(111, 92, 255, .24);
+}
+
+body.libtv-surface.director-page .director-brand-name,
+body.libtv-surface.director-page .director-title-wrap h1 {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.director-page .director-title-wrap {
+    border-left-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.director-page .director-title-wrap p,
+body.libtv-surface.director-page .director-save-state {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface.director-page .director-save-state[data-state="saved"] {
+    color: var(--ltv-ok) !important;
+}
+
+body.libtv-surface.director-page .director-save-state[data-state="saving"] {
+    color: #f3c969 !important;
+}
+
+body.libtv-surface.director-page .director-save-state[data-state="error"] {
+    color: var(--ltv-fail) !important;
+}
+
+body.libtv-surface.director-page .director-loading,
+body.libtv-surface.director-page .director-error,
+body.libtv-surface.director-page .director-local-note,
+body.libtv-surface.director-page .director-toast {
+    color: var(--ltv-muted) !important;
+    background: rgba(20, 23, 30, .96) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .36) !important;
+}
+
+body.libtv-surface.director-page .director-error strong {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.director-page .director-local-note {
+    color: #d8cdfd !important;
+    border-color: rgba(111, 92, 255, .42) !important;
+    background: rgba(43, 35, 79, .52) !important;
+}
+
+/* Shared 3D stage tokens.  Explicit !important values are intentional for
+ * `.vwf-stage.is-desk`, whose legacy rule sets a white background directly. */
+body.libtv-surface .vwf-stage {
+    --desk: #14171e !important;
+    --desk-line: #2a303b !important;
+    --desk-muted: #9199a6 !important;
+    --desk-soft: #1b2028 !important;
+    --desk-view: #0d1117 !important;
+    --desk-accent: var(--ltv-purple) !important;
+    color: var(--ltv-text) !important;
+    background: var(--desk) !important;
+    border-color: var(--desk-line) !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .42) !important;
+}
+
+body.libtv-surface .vwf-stage.is-desk {
+    background: var(--ltv-bg) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-bar {
+    color: var(--ltv-text) !important;
+    background: #111419 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-brand,
+body.libtv-surface .vwf-stage .vwf-desk-brand small {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-brand small {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-crane,
+body.libtv-surface .vwf-stage .vwf-ibar {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-ibar:hover,
+body.libtv-surface .vwf-stage .vwf-ibar.is-on {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-ibar.is-on {
+    box-shadow: inset 0 0 0 1px rgba(9, 202, 245, .34) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-exit,
+body.libtv-surface .vwf-stage .vwf-desk-open-page {
+    color: var(--ltv-muted) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-desk-exit:hover,
+body.libtv-surface .vwf-stage .vwf-desk-open-page:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface .vwf-stage-studio {
+    background: var(--ltv-bg) !important;
+}
+
+body.libtv-surface .vwf-stage-tabcol,
+body.libtv-surface .vwf-stage-lib,
+body.libtv-surface .vwf-stage-side {
+    color: var(--ltv-text) !important;
+    background: #12151a !important;
+    border-color: var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage-tab {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage-tab:hover,
+body.libtv-surface .vwf-stage-tab.is-on {
+    color: #fff !important;
+    background: #242a33 !important;
+}
+
+body.libtv-surface .vwf-stage-tab.is-on {
+    box-shadow: inset 2px 0 0 var(--ltv-cyan) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-lib-search input,
+body.libtv-surface .vwf-stage .vwf-stage-card,
+body.libtv-surface .vwf-stage .vwf-kind-card,
+body.libtv-surface .vwf-stage .vwf-tree-row,
+body.libtv-surface .vwf-stage .vwf-lib-fold {
+    color: var(--ltv-text) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-lib-search input {
+    outline: none;
+}
+
+body.libtv-surface .vwf-stage .vwf-lib-search input::placeholder {
+    color: #687384 !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-stage-card span,
+body.libtv-surface .vwf-stage .vwf-lib-head,
+body.libtv-surface .vwf-stage .vwf-tree-h,
+body.libtv-surface .vwf-stage .vwf-tree-row .dot {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-stage-card:hover,
+body.libtv-surface .vwf-stage .vwf-kind-card:hover,
+body.libtv-surface .vwf-stage .vwf-tree-row:hover,
+body.libtv-surface .vwf-stage .vwf-tree-row.is-on,
+body.libtv-surface .vwf-stage .vwf-stage-card.is-on {
+    color: #fff !important;
+    background: #242a33 !important;
+    border-color: rgba(9, 202, 245, .42) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-kind-card svg,
+body.libtv-surface .vwf-stage .vwf-stage-card svg,
+body.libtv-surface .vwf-stage .vwf-stage-tab svg {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-action-mark {
+    color: #d8cdfd !important;
+    background: rgba(111, 92, 255, .2) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-stage-viewport {
+    background:
+        radial-gradient(circle at 50% 32%, rgba(111, 92, 255, .09), transparent 48%),
+        #0d1117 !important;
+    border: 0 !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-stage-canvas,
+body.libtv-surface .vwf-stage .vwf-stage-view3d {
+    background: #0b0f14 !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-walk-hud,
+body.libtv-surface .vwf-stage .vwf-axis-hud,
+body.libtv-surface .vwf-stage .vwf-reset-view,
+body.libtv-surface .vwf-stage .vwf-stage-tools,
+body.libtv-surface .vwf-stage .vwf-shot-fab {
+    color: var(--ltv-text) !important;
+    background: rgba(20, 23, 30, .96) !important;
+    border: 1px solid var(--ltv-line) !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, .42) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-walk-head,
+body.libtv-surface .vwf-stage .vwf-walk-cap {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-walk-k,
+body.libtv-surface .vwf-stage .vwf-tool {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-walk-k:hover,
+body.libtv-surface .vwf-stage .vwf-walk-k.is-down,
+body.libtv-surface .vwf-stage .vwf-walk-k:active,
+body.libtv-surface .vwf-stage .vwf-tool:hover,
+body.libtv-surface .vwf-stage .vwf-tool.is-on {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-reset-view:hover,
+body.libtv-surface .vwf-stage .vwf-shot-fab:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-stage-side {
+    background: #12151a !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-side-block {
+    border-bottom-color: var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-side-block > .vwf-head,
+body.libtv-surface .vwf-stage .vwf-side-block .vwf-head,
+body.libtv-surface .vwf-stage .vwf-cam-row,
+body.libtv-surface .vwf-stage .vwf-color-row,
+body.libtv-surface .vwf-stage .vwf-facing,
+body.libtv-surface .vwf-stage .vwf-slider,
+body.libtv-surface .vwf-stage .vwf-check,
+body.libtv-surface .vwf-stage .vwf-note,
+body.libtv-surface .vwf-stage .vwf-label {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-side-block > .vwf-head {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .vwf-stage input,
+body.libtv-surface .vwf-stage select,
+body.libtv-surface .vwf-stage .vwf-mini,
+body.libtv-surface .vwf-stage .vwf-cam-empty,
+body.libtv-surface .vwf-stage .vwf-cam-gl,
+body.libtv-surface .vwf-stage .vwf-xyz label,
+body.libtv-surface .vwf-stage .vwf-seg-toggle {
+    color: var(--ltv-text) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .vwf-stage input::placeholder {
+    color: #687384 !important;
+}
+
+body.libtv-surface .vwf-stage input[type="range"] {
+    accent-color: var(--ltv-cyan);
+    background: transparent !important;
+}
+
+body.libtv-surface .vwf-stage input[type="color"] {
+    padding: 2px !important;
+    background: #0f1217 !important;
+}
+
+body.libtv-surface .vwf-stage option {
+    color: var(--ltv-text) !important;
+    background: #171b22 !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-seg-toggle button {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-seg-toggle button.is-on,
+body.libtv-surface .vwf-stage .vwf-mini.is-on {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+    border-color: var(--ltv-purple) !important;
+}
+
+/* The scene panel includes a few intentionally inline colour hints.  Bring
+ * those labels into the same contrast scale without touching their layout. */
+body.libtv-surface .vwf-stage [style*="color:#64748b"],
+body.libtv-surface .vwf-stage [style*="color: #64748b"],
+body.libtv-surface .vwf-stage [style*="color:#94a3b8"],
+body.libtv-surface .vwf-stage [style*="color: #94a3b8"] {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-cam-gl,
+body.libtv-surface .vwf-stage .vwf-cam-empty {
+    background: #0f141b !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-timeline-bar,
+body.libtv-surface .vwf-stage .vwf-tl-track {
+    color: var(--ltv-muted) !important;
+    background: #11151b !important;
+    border-top-color: var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-timeline-bar {
+    border: 0 !important;
+    border-top: 1px solid var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-tl-controls,
+body.libtv-surface .vwf-stage .vwf-tl-frame,
+body.libtv-surface .vwf-stage .vwf-tl-label,
+body.libtv-surface .vwf-stage .vwf-tl-tick {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-tl-ruler {
+    color: #687384 !important;
+    border-bottom-color: var(--desk-line) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-tl-now,
+body.libtv-surface .vwf-stage .vwf-tl-now::before {
+    background: var(--ltv-purple) !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-tl-kf {
+    background: #8074e8 !important;
+}
+
+body.libtv-surface .vwf-stage .vwf-tl-kf.is-on {
+    background: var(--ltv-cyan) !important;
+}
+
+/* Embedded classic nodes still contain a few hard-coded paper-colour
+ * placeholders.  Only empty/editable surfaces are changed; uploaded media
+ * keeps its original pixels. */
+body.libtv-surface .node .blank-image,
+body.libtv-surface .node .node-drop,
+body.libtv-surface .node .asset-card-tools,
+body.libtv-surface .node .asset-variant,
+body.libtv-surface .node .input-item,
+body.libtv-surface .node .video-input-audio,
+body.libtv-surface .node .llm-mode,
+body.libtv-surface .node .llm-chat-log,
+body.libtv-surface .node .llm-output,
+body.libtv-surface .node .model-row,
+body.libtv-surface .node .model-empty {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node .blank-image {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .node .blank-image:hover,
+body.libtv-surface .node .blank-image.drag-over {
+    color: #fff !important;
+    background: #242a33 !important;
+    border-color: var(--ltv-cyan) !important;
+}
+
+body.libtv-surface .node .asset-card-tools .tool-btn,
+body.libtv-surface .node .asset-variant,
+body.libtv-surface .node .llm-mode button,
+body.libtv-surface .node .llm-copy-btn,
+body.libtv-surface .node .llm-pane-label {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .node .asset-card-tools .tool-btn:hover,
+body.libtv-surface .node .asset-variant:hover,
+body.libtv-surface .node .llm-mode button:hover,
+body.libtv-surface .node .llm-copy-btn:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .node .llm-mode button.active,
+body.libtv-surface .node .seg button.active {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+    border-color: var(--ltv-purple) !important;
+}
+
+body.libtv-surface .node .llm-bubble.assistant {
+    color: var(--ltv-muted) !important;
+    background: #1b2028 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node .llm-bubble.user {
+    color: #fff !important;
+    background: #2b3560 !important;
+}
+
+body.libtv-surface .node .input-label {
+    color: var(--ltv-text) !important;
+    background: rgba(20, 23, 30, .88) !important;
+}
+
+body.libtv-surface .node .video-input-audio {
+    color: #c8f5ff !important;
+    background: #17242b !important;
+    border-color: rgba(9, 202, 245, .28) !important;
+}
+
+body.libtv-surface .node .video-input-audio span {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface .node .asset-card-body,
+body.libtv-surface .node .generator-body,
+body.libtv-surface .node .midjourney-body,
+body.libtv-surface .node .msgen-body,
+body.libtv-surface .node .video-body,
+body.libtv-surface .node .comfy-body,
+body.libtv-surface .node .llm-body {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface .node .asset-card-body > .asset-card-tools,
+body.libtv-surface .node .generator-body .gen-settings,
+body.libtv-surface .node .generator-body .gen-settings-row,
+body.libtv-surface .node .generator-body .input-list,
+body.libtv-surface .node .generator-body .prompt-list,
+body.libtv-surface .node .generator-body .gen-count-row,
+body.libtv-surface .node .generator-body .mode-tabs,
+body.libtv-surface .node .generator-body .ms-model-tabs,
+body.libtv-surface .node .generator-body .llm-provider {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node .generator-body .gen-settings-row,
+body.libtv-surface .node .generator-body .input-list,
+body.libtv-surface .node .generator-body .prompt-list {
+    background: transparent !important;
+    border-color: transparent !important;
+}
+
+body.libtv-surface .node .generator-body .gen-step-btn,
+body.libtv-surface .node .generator-body .gen-count-input,
+body.libtv-surface .node .generator-body .secondary-btn,
+body.libtv-surface .node .generator-body .fit-size-btn {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node .generator-body .gen-step-btn:hover,
+body.libtv-surface .node .generator-body .secondary-btn:hover,
+body.libtv-surface .node .generator-body .fit-size-btn:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .node .generator-body .gen-btn,
+body.libtv-surface .node .generator-body .llm-run,
+body.libtv-surface .node .generator-body .comfy-run {
+    color: #fff !important;
+    background: #303c68 !important;
+    border-color: rgba(111, 92, 255, .5) !important;
+}
+
+body.libtv-surface .node .generator-body .gen-btn:hover:not(:disabled),
+body.libtv-surface .node .generator-body .llm-run:hover:not(:disabled),
+body.libtv-surface .node .generator-body .comfy-run:hover:not(:disabled) {
+    background: #43528a !important;
+}
+
+body.libtv-surface .node .generator-body .gen-btn:disabled,
+body.libtv-surface .node .generator-body .llm-run:disabled,
+body.libtv-surface .node .generator-body .comfy-run:disabled {
+    color: #687384 !important;
+    background: #222831 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node input[type="range"] {
+    accent-color: var(--ltv-cyan);
+}
+
+/* A handful of legacy editor controls intentionally use literal paper
+ * colours in canvas.css (the asset tool strip, video tool strip and utility
+ * text chips).  Neutralise those literals at the skin boundary so a node
+ * never flips back to a white island while the surrounding canvas is dark. */
+body.libtv-surface .node.assetCard-node .asset-card-tools .tool-btn,
+body.libtv-surface .node .asset-pick,
+body.libtv-surface .node .asset-to-stage,
+body.libtv-surface .node .audio-pick {
+    color: var(--ltv-muted) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node.assetCard-node .asset-card-tools .tool-btn:hover,
+body.libtv-surface .node .asset-pick:hover,
+body.libtv-surface .node .asset-to-stage:hover,
+body.libtv-surface .node .audio-pick:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface .node .video-float-tools {
+    color: var(--ltv-text) !important;
+    background: rgba(20, 23, 30, .97) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .44) !important;
+}
+
+body.libtv-surface .node .video-float-tools .vfloat-btn {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+}
+
+body.libtv-surface .node .video-float-tools .vfloat-btn:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+}
+
+body.libtv-surface .node [class*="bg-slate-50"],
+body.libtv-surface .node [class*="bg-slate-100"],
+body.libtv-surface .node [class*="bg-white"] {
+    color: var(--ltv-text) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface .node [class*="text-slate-400"],
+body.libtv-surface .node [class*="text-slate-500"],
+body.libtv-surface .node [class*="text-gray-400"],
+body.libtv-surface .node [class*="text-gray-500"] {
+    color: var(--ltv-muted) !important;
+}
+
+/* Keep the project-owned contact affordance visually quiet, like LibTV's
+ * utility controls, while its configured text/link remains unchanged. */
+body.libtv-surface .studio-contact-launcher {
+    color: var(--ltv-text) !important;
+    background: #1b1f26 !important;
+    border-color: var(--ltv-line-strong) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .42) !important;
+}
+
+body.libtv-surface .studio-contact-launcher:hover {
+    color: #fff !important;
+    background: #273445 !important;
+    border-color: rgba(9, 202, 245, .48) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.libtv-surface .vwf-stage *,
+    body.libtv-surface.director-page * {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Root shell + home surface                                                 */
+/* ------------------------------------------------------------------------- */
+
+/* The root launcher predates the canvas skin and keeps its own variable
+ * names (--bg/--stage-bg/--sidebar-bg).  Map those names to the same LibTV
+ * graphite palette instead of changing its iframe/router implementation. */
+body.libtv-surface.index-libtv {
+    --bg: var(--ltv-bg) !important;
+    --sidebar-bg: #101318 !important;
+    --stage-bg: #101318 !important;
+    --border: var(--ltv-line) !important;
+    --stage-border: #303a49 !important;
+    --text: var(--ltv-text) !important;
+    --muted: var(--ltv-muted) !important;
+    --nav-hover-bg: var(--ltv-panel-hover) !important;
+    --monitor-bg: rgba(20, 23, 30, .92) !important;
+    --monitor-border: var(--ltv-line-soft) !important;
+    --monitor-shadow: var(--ltv-shadow) !important;
+    --divider: rgba(255, 255, 255, .12) !important;
+    --scrollbar: #364152 !important;
+    --scrollbar-hover: #4b586b !important;
+    --author-name: var(--ltv-text) !important;
+    --social-icon: var(--ltv-muted) !important;
+    --accent: var(--ltv-purple) !important;
+    background: var(--ltv-bg) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.index-libtv .app-shell {
+    background:
+        radial-gradient(ellipse at 30% 18%, rgba(9, 202, 245, .045), transparent 44%),
+        var(--ltv-bg) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.index-libtv .sidebar {
+    background: #101318 !important;
+    border-right: 1px solid var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+    box-shadow: 8px 0 28px rgba(0, 0, 0, .28) !important;
+}
+
+body.libtv-surface.index-libtv .stage {
+    background: #101318 !important;
+    border-color: #303a49 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .38) !important;
+}
+
+body.libtv-surface.index-libtv .logo-ring {
+    color: var(--ltv-cyan) !important;
+    background: #171c24 !important;
+    border-color: rgba(9, 202, 245, .64) !important;
+    box-shadow: 0 0 0 4px rgba(9, 202, 245, .08), 0 10px 24px rgba(0, 0, 0, .26) !important;
+}
+
+body.libtv-surface.index-libtv .logo-ring:hover,
+body.libtv-surface.index-libtv .logo-ring:focus-visible {
+    color: #fff !important;
+    background: #222b38 !important;
+    border-color: var(--ltv-cyan) !important;
+}
+
+body.libtv-surface.index-libtv .brand-lockup {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.index-libtv .brand-lockup-mark {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+    box-shadow: 0 6px 18px rgba(111, 92, 255, .28) !important;
+}
+
+body.libtv-surface.index-libtv .brand-lockup-name {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.index-libtv .nav-item,
+body.libtv-surface.index-libtv .nav-fold-toggle {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.index-libtv .nav-item:hover,
+body.libtv-surface.index-libtv .nav-fold-toggle:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface.index-libtv .nav-item.active,
+body.libtv-surface.index-libtv .side-pill.active {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+    border-color: var(--ltv-purple) !important;
+    box-shadow: 0 8px 22px rgba(111, 92, 255, .22) !important;
+}
+
+body.libtv-surface.index-libtv .side-pill {
+    color: var(--ltv-muted) !important;
+    background: transparent !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface.index-libtv .side-pill:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+body.libtv-surface.index-libtv .settings-fold-group {
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.index-libtv .project-version-badge {
+    color: var(--ltv-faint) !important;
+    background: #171c24 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-card {
+    color: var(--ltv-text) !important;
+    background: #14171e !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .28) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-card:hover {
+    background: #1b2028 !important;
+    border-color: rgba(9, 202, 245, .42) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-avatar {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-copy strong {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-copy small {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-contact {
+    color: #b8f2ff !important;
+    background: rgba(9, 202, 245, .1) !important;
+    border-color: rgba(9, 202, 245, .34) !important;
+}
+
+body.libtv-surface.index-libtv .studio-owner-contact:hover {
+    color: #fff !important;
+    background: #1e6271 !important;
+    border-color: var(--ltv-cyan) !important;
+}
+
+body.libtv-surface.index-libtv .studio-contact-modal,
+body.libtv-surface.index-libtv .studio-modal {
+    background: rgba(4, 7, 11, .72) !important;
+}
+
+body.libtv-surface.index-libtv .studio-contact-panel,
+body.libtv-surface.index-libtv .studio-modal-panel {
+    color: var(--ltv-text) !important;
+    background: #14171e !important;
+    border-color: var(--ltv-line-strong) !important;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .56) !important;
+}
+
+body.libtv-surface.index-libtv .studio-contact-close,
+body.libtv-surface.index-libtv .studio-contact-row,
+body.libtv-surface.index-libtv .studio-contact-empty {
+    color: var(--ltv-muted) !important;
+    background: #171b22 !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.index-libtv .studio-contact-row:hover,
+body.libtv-surface.index-libtv .studio-contact-close:hover {
+    color: #fff !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: rgba(9, 202, 245, .48) !important;
+}
+
+/* The landing iframe uses a separate .home root.  Keep its copy and cards
+ * dark as soon as it loads, so the root shell never flashes a white island. */
+body.libtv-surface.home-libtv {
+    --home-bg: var(--ltv-bg) !important;
+    --home-ink: var(--ltv-text) !important;
+    --home-muted: var(--ltv-muted) !important;
+    --home-faint: var(--ltv-faint) !important;
+    --home-line: var(--ltv-line) !important;
+    --home-card: var(--ltv-panel) !important;
+    --home-teal: var(--ltv-cyan) !important;
+    --home-teal-2: #b8f2ff !important;
+    --home-soft: rgba(9, 202, 245, .12) !important;
+    --home-lime: #b8d66b !important;
+    --home-shadow: 0 18px 42px rgba(0, 0, 0, .36) !important;
+    color: var(--ltv-text) !important;
+    background:
+        radial-gradient(ellipse at 52% 0%, rgba(111, 92, 255, .08), transparent 44%),
+        var(--ltv-bg) !important;
+}
+
+body.libtv-surface.home-libtv .home {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.home-libtv .home-kicker {
+    color: #b8f2ff !important;
+    background: rgba(9, 202, 245, .12) !important;
+    border: 1px solid rgba(9, 202, 245, .26) !important;
+}
+
+body.libtv-surface.home-libtv .home-hero h1,
+body.libtv-surface.home-libtv .home-section-head h3 {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.home-libtv .home-hero p,
+body.libtv-surface.home-libtv .home-card p,
+body.libtv-surface.home-libtv .home-empty,
+body.libtv-surface.home-libtv .home-status {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-surface.home-libtv .home-card,
+body.libtv-surface.home-libtv .home-recent-card,
+body.libtv-surface.home-libtv .home-status {
+    color: var(--ltv-text) !important;
+    background: #14171e !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .3) !important;
+}
+
+body.libtv-surface.home-libtv .home-card:hover,
+body.libtv-surface.home-libtv .home-recent-card:hover {
+    background: #1a202a !important;
+    border-color: rgba(9, 202, 245, .5) !important;
+    box-shadow: 0 22px 44px rgba(0, 0, 0, .42) !important;
+}
+
+body.libtv-surface.home-libtv .home-card-icon {
+    color: var(--ltv-cyan) !important;
+    background: rgba(9, 202, 245, .14) !important;
+}
+
+body.libtv-surface.home-libtv .home-card span,
+body.libtv-surface.home-libtv .home-section-head button,
+body.libtv-surface.home-libtv .home-link {
+    color: #b8f2ff !important;
+}
+
+body.libtv-surface.home-libtv .home-recent-kind {
+    color: #b8f2ff !important;
+    background: rgba(9, 202, 245, .13) !important;
+}
+
+body.libtv-surface.home-libtv .home-recent-card small {
+    color: var(--ltv-faint) !important;
+}
+
+body.libtv-surface.home-libtv .home-status b {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.home-libtv .home-status button {
+    color: #fff !important;
+    background: var(--ltv-purple) !important;
+    border: 1px solid rgba(138, 123, 255, .54) !important;
+}
+
+body.libtv-surface.home-libtv .home-status.is-ok button {
+    color: #b8f2ff !important;
+    background: rgba(9, 202, 245, .13) !important;
+    border-color: rgba(9, 202, 245, .32) !important;
+}
+
+/* StudioTheme already toggles this class on both the outer page and its
+ * iframe.  A second, higher-contrast graphite palette keeps the button
+ * meaningful without falling back to the old paper/green treatment. */
+body.libtv-surface.theme-dark {
+    --ltv-bg: #070a0f !important;
+    --ltv-bg-elevated: #0c1118 !important;
+    --ltv-panel: #171d27 !important;
+    --ltv-panel-strong: #222a37 !important;
+    --ltv-panel-hover: #2b3748 !important;
+    --ltv-line: #354252 !important;
+    --ltv-line-soft: rgba(255, 255, 255, .14) !important;
+    --ltv-line-strong: #516176 !important;
+    --ltv-text: #ffffff !important;
+    --ltv-muted: #b6c2d0 !important;
+    --ltv-faint: #8190a2 !important;
+    --ltv-cyan: #36d8ff !important;
+    --ltv-cyan-soft: rgba(54, 216, 255, .17) !important;
+    --ltv-purple: #8a7bff !important;
+    --ltv-purple-soft: rgba(138, 123, 255, .24) !important;
+    --ltv-shadow: rgba(0, 0, 0, .52) !important;
+    background-color: var(--ltv-bg) !important;
+}
+
+body.libtv-surface.theme-dark .shell,
+body.libtv-surface.theme-dark .board,
+body.libtv-surface.theme-dark .app-shell,
+body.libtv-surface.theme-dark .stage,
+body.libtv-surface.theme-dark .home-libtv,
+body.libtv-surface.theme-dark .home {
+    background-color: var(--ltv-bg) !important;
+}
+
+body.libtv-surface.theme-dark.index-libtv .sidebar,
+body.libtv-surface.theme-dark.index-libtv .stage {
+    background-color: var(--ltv-panel) !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.theme-dark.home-libtv .home-card,
+body.libtv-surface.theme-dark.home-libtv .home-recent-card,
+body.libtv-surface.theme-dark.home-libtv .home-status {
+    background-color: var(--ltv-panel) !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage {
+    --desk: #171d27 !important;
+    --desk-line: #3a4656 !important;
+    --desk-muted: #b6c2d0 !important;
+    --desk-soft: #202936 !important;
+    --desk-view: #0b1119 !important;
+    --desk-accent: var(--ltv-purple) !important;
+    color: var(--ltv-text) !important;
+    background: var(--desk) !important;
+    border-color: var(--desk-line) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage.is-desk {
+    background: var(--ltv-bg) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage .vwf-desk-bar {
+    background: #151b24 !important;
+    border-bottom-color: var(--desk-line) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage-studio,
+body.libtv-surface.theme-dark .vwf-stage-tabcol,
+body.libtv-surface.theme-dark .vwf-stage-lib,
+body.libtv-surface.theme-dark .vwf-stage-side {
+    background-color: #171d27 !important;
+    border-color: var(--desk-line) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage .vwf-stage-viewport {
+    background:
+        radial-gradient(circle at 50% 32%, rgba(138, 123, 255, .12), transparent 48%),
+        var(--desk-view) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage .vwf-timeline-bar,
+body.libtv-surface.theme-dark .vwf-stage .vwf-tl-track {
+    background-color: #151c25 !important;
+    border-top-color: var(--desk-line) !important;
+}
+
+body.libtv-surface.theme-dark .vwf-stage input,
+body.libtv-surface.theme-dark .vwf-stage select,
+body.libtv-surface.theme-dark .vwf-stage .vwf-mini,
+body.libtv-surface.theme-dark .vwf-stage .vwf-xyz label {
+    background-color: #202936 !important;
+    border-color: var(--desk-line) !important;
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-surface.theme-dark .node .blank-image,
+body.libtv-surface.theme-dark .node .node-drop,
+body.libtv-surface.theme-dark .node .input-item,
+body.libtv-surface.theme-dark .node .asset-card-tools,
+body.libtv-surface.theme-dark .node .asset-variant {
+    background-color: #202936 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-muted) !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* LibTV editor chrome refinement                                             */
+/* ------------------------------------------------------------------------- */
+
+/* The original editor templates carry a large back button and a text-heavy
+ * toolbar.  Keep those hit targets, but present them as the quiet brand/title
+ * strip used by a node studio.  This is desktop-only by design. */
+body.libtv-surface .libtv-brand-lockup {
+    position: absolute;
+    left: 22px;
+    top: 21px;
+    z-index: 64;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    color: var(--ltv-text);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* A quiet top veil is part of the editor chrome, not a second panel.  It
+ * masks world content that starts at y=0 in older saved canvases so the
+ * project mark/back affordance/title remain readable while the infinite
+ * surface still shows through below the first few rows.  It is paint-only and
+ * never captures pointer events. */
+body.libtv-surface .libtv-canvas-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 92px;
+    z-index: 12;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(11, 13, 17, .96) 0%, rgba(11, 13, 17, .84) 45%, rgba(11, 13, 17, .28) 78%, transparent 100%);
+}
+
+body.libtv-surface .libtv-brand-mark {
+    width: 31px;
+    height: 31px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(161, 244, 255, .62);
+    border-radius: 9px;
+    color: #071015;
+    background: linear-gradient(145deg, #d9fbff 0%, #64e6ff 42%, #8a7bff 100%);
+    box-shadow: 0 0 0 4px rgba(9, 202, 245, .06), 0 8px 22px rgba(9, 202, 245, .18);
+    font-size: 9px;
+    font-weight: 950;
+    letter-spacing: .06em;
+}
+
+body.libtv-surface .libtv-brand-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+body.libtv-surface .libtv-brand-copy strong {
+    max-width: 150px;
+    overflow: hidden;
+    color: var(--ltv-text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .015em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-brand-copy small {
+    color: var(--ltv-faint);
+    font-size: 8.5px;
+    font-weight: 650;
+    letter-spacing: .08em;
+}
+
+/* Make the floating contact launcher a manager/home affordance, not a
+ * permanent editor obstruction.  The configured contact modal remains
+ * reachable from the manager sidebar and can still be opened by keyboard. */
+body.libtv-surface:has(> .shell.libtv-canvas-shell) .studio-contact-launcher {
+    display: none !important;
+}
+
+/* Common legacy controls that otherwise retain a paper-white hard-coded
+ * background when the 3D desk is expanded. */
+body.libtv-surface :where(.vwf-engine-chip, .vwf-mini, .vwf-stage-card, .resize-handle, .node-resize-handle) {
+    color: var(--ltv-muted) !important;
+    background: #1b212b !important;
+    border-color: var(--ltv-line) !important;
+}
+body.libtv-surface :where(.vwf-engine-chip, .vwf-mini, .vwf-stage-card, .resize-handle, .node-resize-handle):hover {
+    color: var(--ltv-text) !important;
+    background: var(--ltv-panel-hover) !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+
+@media (min-width: 901px) {
+    /* Align the classic topbar after the generated brand lockup. */
+    body.libtv-surface .libtv-canvas-shell > .topbar {
+        padding-left: 186px !important;
+    }
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .topbar {
+        left: 18px;
+        right: 18px;
+        padding-left: 186px;
+        gap: 10px;
+    }
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .topbar .canvas-nav {
+        max-width: min(300px, calc(100vw - 540px));
+    }
+
+    /* Smart editor: icon-only back affordance plus a compact title. */
+    body.libtv-surface .smart-back {
+        left: 186px !important;
+        top: 20px !important;
+        width: 34px !important;
+        min-width: 34px !important;
+        height: 34px !important;
+        padding: 0 !important;
+        justify-content: center;
+        border-radius: 9px !important;
+    }
+    body.libtv-surface .smart-back span { display: none !important; }
+    body.libtv-surface .smart-title {
+        left: 233px !important;
+        top: 30px !important;
+        max-width: min(360px, calc(100vw - 560px));
+        color: var(--ltv-text) !important;
+        font-size: 12px !important;
+    }
+
+    /* LibTV keeps the upper-right utility strip deliberately compact; labels
+     * remain available through title/aria-label for keyboard and hover users. */
+    body.libtv-surface .smart-utility-strip {
+        right: 20px;
+        top: 20px;
+        gap: 2px;
+        padding: 4px;
+    }
+    body.libtv-surface .smart-utility-strip > button {
+        width: 34px !important;
+        min-width: 34px !important;
+        padding: 0 !important;
+        justify-content: center;
+    }
+    body.libtv-surface .smart-utility-strip > button span { display: none !important; }
+
+    /* Minimap is useful, but it should read as a quiet navigator rather than
+     * a second panel competing with the workspace. */
+    body.libtv-surface .smart-minimap,
+    body.libtv-surface .minimap {
+        width: 154px !important;
+        height: 102px !important;
+        right: 20px !important;
+        bottom: 20px !important;
+        border-radius: 12px !important;
+        opacity: .78;
+    }
+    body.libtv-surface .libtv-empty-canvas .smart-minimap,
+    body.libtv-surface .libtv-empty-canvas .minimap {
+        opacity: .34;
+    }
+}
+
+@media (max-width: 900px) {
+    body.libtv-surface .libtv-brand-lockup { left: 14px; top: 16px; }
+    body.libtv-surface .libtv-brand-copy { display: none; }
+}
+
+/* ------------------------------------------------------------------------- */
+/* LibTV bottom view dock + empty workspace                                  */
+/* ------------------------------------------------------------------------- */
+
+/* The dock mirrors LibTV's compact lower-left navigator.  It is deliberately
+ * anchored to the framed shell (rather than the transformed world) so zooming
+ * and panning never move the controls with canvas content. */
+body.libtv-surface .libtv-dock {
+    position: absolute;
+    left: 22px;
+    bottom: 20px;
+    z-index: 72;
+    min-height: 42px;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 11px;
+    color: var(--ltv-muted);
+    background: rgba(18, 21, 28, .9);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .045);
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    user-select: none;
+}
+
+body.libtv-surface .libtv-dock-mode {
+    height: 32px;
+    padding: 0 9px 0 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    color: var(--ltv-cyan);
+    background: rgba(9, 202, 245, .1);
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-dock-mode i,
+body.libtv-surface .libtv-dock-mode svg {
+    width: 15px;
+    height: 15px;
+    stroke-width: 1.8;
+}
+
+body.libtv-surface .libtv-dock-separator {
+    width: 1px;
+    height: 20px;
+    margin: 0 3px;
+    background: rgba(255, 255, 255, .12);
+}
+
+body.libtv-surface .libtv-dock-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 0;
+    border-radius: 8px;
+    color: var(--ltv-muted);
+    background: transparent;
+    font-size: 10px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: color .16s ease, background .16s ease, transform .16s ease;
+}
+
+body.libtv-surface .libtv-dock-btn:hover,
+body.libtv-surface .libtv-dock-btn:focus-visible {
+    color: #fff;
+    background: var(--ltv-panel-hover);
+    transform: translateY(-1px);
+}
+
+body.libtv-surface .libtv-dock-btn:active {
+    transform: translateY(0) scale(.96);
+}
+
+body.libtv-surface .libtv-dock-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.9;
+}
+
+body.libtv-surface .libtv-dock-fit {
+    color: #d6d1ff;
+    background: rgba(111, 92, 255, .11);
+}
+
+body.libtv-surface .libtv-dock-fit:hover,
+body.libtv-surface .libtv-dock-fit:focus-visible {
+    color: #fff;
+    background: rgba(111, 92, 255, .28);
+}
+
+body.libtv-surface .libtv-dock-zoom {
+    min-width: 45px;
+    height: 32px;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ltv-text);
+    font-size: 10px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+}
+
+/* Empty-state cards are intentionally lighter than the surrounding chrome:
+ * they form a quiet starting point without becoming a modal or blocking the
+ * infinite board.  Pointer events stay off the wrapper so a click on blank
+ * canvas retains its native pan/double-click behavior. */
+body.libtv-surface .libtv-empty-state {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 90px 24px 94px;
+    color: var(--ltv-text);
+    text-align: center;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+}
+
+body.libtv-surface .libtv-empty-state.is-hidden {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+}
+
+body.libtv-surface .libtv-empty-orbit {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(9, 202, 245, .36);
+    border-radius: 50%;
+    color: var(--ltv-cyan);
+    background:
+        radial-gradient(circle at 35% 30%, rgba(9, 202, 245, .24), transparent 54%),
+        rgba(9, 202, 245, .07);
+    box-shadow: 0 0 0 8px rgba(9, 202, 245, .035), 0 0 30px rgba(9, 202, 245, .18);
+    animation: libtvEmptyOrbit 4.5s ease-in-out infinite;
+}
+
+body.libtv-surface .libtv-empty-orbit::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    margin: -32px 0 0 32px;
+    border-radius: 50%;
+    background: #d7fbff;
+    box-shadow: 0 0 10px 3px rgba(9, 202, 245, .65);
+}
+
+body.libtv-surface .libtv-empty-orbit svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 1.55;
+}
+
+body.libtv-surface .libtv-empty-kicker {
+    color: var(--ltv-cyan);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .19em;
+}
+
+body.libtv-surface .libtv-empty-state h2 {
+    margin: 0;
+    color: var(--ltv-text);
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.2;
+    font-weight: 760;
+    letter-spacing: -.025em;
+}
+
+body.libtv-surface .libtv-empty-state p {
+    max-width: 420px;
+    margin: 0 0 10px;
+    color: var(--ltv-muted);
+    font-size: 11px;
+    line-height: 1.5;
+    font-weight: 550;
+}
+
+body.libtv-surface .libtv-empty-actions {
+    width: min(620px, calc(100vw - 160px));
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    pointer-events: auto;
+}
+
+body.libtv-surface .libtv-empty-actions button {
+    min-width: 0;
+    min-height: 62px;
+    padding: 10px 11px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid rgba(255, 255, 255, .105);
+    border-radius: 10px;
+    color: var(--ltv-muted);
+    background: rgba(20, 23, 30, .72);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .035);
+    text-align: left;
+    cursor: pointer;
+    transition: color .16s ease, background .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+body.libtv-surface .libtv-empty-actions button:hover,
+body.libtv-surface .libtv-empty-actions button:focus-visible {
+    color: #fff;
+    border-color: rgba(9, 202, 245, .48);
+    background: rgba(27, 34, 44, .92);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .3), 0 0 0 1px rgba(9, 202, 245, .08);
+    transform: translateY(-2px);
+}
+
+body.libtv-surface .libtv-empty-actions button:active {
+    transform: translateY(0) scale(.98);
+}
+
+body.libtv-surface .libtv-empty-actions button > svg,
+body.libtv-surface .libtv-empty-actions button > i {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    color: var(--ltv-cyan);
+    stroke-width: 1.75;
+}
+
+body.libtv-surface .libtv-empty-actions button span {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+body.libtv-surface .libtv-empty-actions button b {
+    overflow: hidden;
+    color: inherit;
+    font-size: 11px;
+    font-weight: 760;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-empty-actions button small {
+    overflow: hidden;
+    color: var(--ltv-faint);
+    font-size: 9px;
+    font-weight: 550;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-empty-actions button:hover small,
+body.libtv-surface .libtv-empty-actions button:focus-visible small {
+    color: #b7c7d8;
+}
+
+body.libtv-surface .libtv-focus-pulse {
+    animation: libtvFocusPulse .7s ease both;
+}
+
+@keyframes libtvEmptyOrbit {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-4px) rotate(3deg); }
+}
+
+@keyframes libtvFocusPulse {
+    0% { box-shadow: 0 0 0 0 rgba(9, 202, 245, .45); }
+    100% { box-shadow: 0 0 0 8px rgba(9, 202, 245, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.libtv-surface .libtv-empty-orbit,
+    body.libtv-surface .libtv-focus-pulse {
+        animation: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    body.libtv-surface .libtv-dock {
+        left: 14px;
+        bottom: 14px;
+    }
+    body.libtv-surface .libtv-empty-actions {
+        width: min(620px, calc(100vw - 48px));
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* LibTV project board framing (desktop)                                    */
+/* ------------------------------------------------------------------------- */
+/* Keep list chrome floating inside the dark studio frame so the transformed
+ * card world can never paint beneath the heading or bulk actions. */
+body.libtv-surface:has(.workspace) .ws-main {
+    gap: 8px;
+    padding: 12px 14px 14px;
+    background:
+      radial-gradient(1000px 560px at 72% -14%, rgba(111, 92, 255, .10), transparent 62%),
+      #0b0e13 !important;
+}
+body.libtv-surface:has(.workspace) .ws-topbar {
+    flex: 0 0 62px;
+    min-height: 62px;
+    padding: 10px 14px 10px 18px;
+    border: 1px solid rgba(255, 255, 255, .095) !important;
+    border-radius: 14px;
+    background: rgba(15, 18, 23, .94) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+body.libtv-surface:has(.workspace) .ws-bulk-toolbar {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 6px 12px 6px 16px;
+    border: 1px solid rgba(255, 255, 255, .075) !important;
+    border-radius: 11px;
+    background: rgba(15, 18, 23, .88) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+}
+body.libtv-surface:has(.workspace) .ws-board {
+    min-height: 0;
+    border: 1px solid rgba(255, 255, 255, .085);
+    border-radius: 16px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035), 0 18px 38px rgba(0, 0, 0, .25);
+    isolation: isolate;
+}
+body.libtv-surface:has(.workspace) .ws-board-world {
+    z-index: 1;
+}
+body.libtv-surface:has(.workspace) .ws-board-empty,
+body.libtv-surface:has(.workspace) .libtv-empty-state {
+    z-index: 4;
+}
+/* Keep the actions legible against the graphite frame, including disabled
+ * actions before a selection is made. */
+body.libtv-surface:has(.workspace) .ws-bulk-btn {
+    min-height: 30px;
+    color: #aeb9c8 !important;
+    background: #181d25 !important;
+    border-color: rgba(255, 255, 255, .11) !important;
+}
+body.libtv-surface:has(.workspace) .ws-bulk-btn:disabled {
+    color: #647080 !important;
+    opacity: .72;
+}
+body.libtv-surface:has(.workspace) .ws-bulk-btn.danger:not(:disabled) {
+    color: #ff9f9f !important;
+    background: rgba(191, 46, 74, .18) !important;
+    border-color: rgba(255, 116, 140, .30) !important;
+}
+body.libtv-surface:has(.workspace) .ws-board::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 24px;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(11, 14, 19, .72), rgba(11, 14, 19, 0));
+}
+
+/* Dense graphs keep one soft halo behind each aggregate tube.  It gives the
+   continuous material a little depth at desktop zoom without restoring the
+   expensive per-edge glow layers. */
+body.libtv-surface .connection-layer .conn-flow-dense-glow {
+    pointer-events: none !important;
+    vector-effect: non-scaling-stroke;
+    stroke: var(--conn-flow-gradient, #2dd4bf) !important;
+    stroke-width: 8px !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .14 !important;
+    filter: drop-shadow(0 0 7px var(--conn-flow-shadow, rgba(20,184,166,.58))) blur(.7px) !important;
+    animation: libtvFluidGlow 4.6s ease-in-out infinite !important;
+}
+body.libtv-surface .connection-layer.conn-reduce-motion .conn-flow-dense-glow {
+    animation: none !important;
+    opacity: .08 !important;
+}
+
+/* ------------------------------------------------------------------------- */
+/* LibTV desktop viewport guard                                              */
+/* ------------------------------------------------------------------------- */
+/*
+ * The editor is an infinite surface, so older saved workflows may begin
+ * underneath the fixed brand/title strip.  Keep a quiet, opaque chrome band
+ * above the world while retaining the existing DOM hit targets.  This is
+ * intentionally presentation-only: no node dimensions, coordinates, or
+ * connection geometry are changed here.
+ */
+@media (min-width: 901px) {
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell {
+        isolation: isolate;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell::before {
+        z-index: 12 !important;
+        height: 124px !important;
+        background: linear-gradient(
+            180deg,
+            rgba(8, 11, 15, .995) 0%,
+            rgba(8, 11, 15, .975) 58%,
+            rgba(8, 11, 15, .72) 82%,
+            rgba(8, 11, 15, 0) 100%
+        ) !important;
+    }
+
+    /* Give the controls their own compositing context.  A transformed world
+       can then never bleed through translucent text/button backgrounds. */
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .topbar,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .smart-back,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .smart-title {
+        isolation: isolate;
+        /* The veil is deliberately above the transformed world, but never
+           above the actual chrome.  Keeping the title/back affordance in the
+           same high stacking band prevents old cards at y=0 from washing out
+           the text (the original source used z-index 10 for .smart-title). */
+        z-index: 64 !important;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .topbar .canvas-nav,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .topbar .toolbar,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .smart-back {
+        background: rgba(14, 18, 24, .97) !important;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell > .smart-title {
+        padding: 5px 10px !important;
+        border: 1px solid rgba(255, 255, 255, .105) !important;
+        border-radius: 8px !important;
+        background: rgba(14, 18, 24, .94) !important;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+        line-height: 1.2;
+    }
+
+    /* Paint order is explicit: wires stay behind cards, while cards get an
+       isolated backdrop so a bright fluid glow cannot wash out their text. */
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell .world > .image-node,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell #nodes > .node {
+        isolation: isolate;
+    }
+
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell .connection-layer,
+    body.libtv-surface:has(> .shell.libtv-canvas-shell) > .shell.libtv-canvas-shell #links {
+        z-index: 0 !important;
+    }
+
+    /* Idle glow should read as a soft material edge without washing out card
+       text.  Keep it visible at a zoomed-out desktop scale; selected/active
+       paths retain their stronger state colours. */
+    body.libtv-surface .connection-layer:not(.conn-dense-motion) .conn-flow-glow:not(.conn-selected):not(.conn-cascade-active),
+    body.libtv-surface #links .link-motion-glow:not(.link-active):not(.link-hovered) {
+        opacity: .16 !important;
+    }
+
+    /* LibTV's graphite wires remain the base layer, while the continuous
+       liquid body and moving spark carry enough contrast to read on dark
+       boards.  Selected and active states intentionally retain their stronger
+       contrast above. */
+    body.libtv-surface .connection-layer:not(.conn-dense-motion) .conn-flow:not(.conn-selected):not(.conn-cascade-active) {
+        opacity: .94 !important;
+    }
+    body.libtv-surface .connection-layer:not(.conn-dense-motion) .conn-flow-core:not(.conn-selected):not(.conn-cascade-active) {
+        opacity: .50 !important;
+    }
+    body.libtv-surface #links .link-motion-flow:not(.link-active):not(.link-hovered) {
+        opacity: .94 !important;
+    }
+    body.libtv-surface #links .link-motion-core:not(.link-active):not(.link-hovered) {
+        opacity: .50 !important;
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Historical smart-canvas context ribbon                                   */
+/* ------------------------------------------------------------------------- */
+/*
+ * Long-lived prompt canvases often keep a wide "how to use" or script card
+ * at the top of the world.  LibTV keeps context in a quiet chrome ribbon so
+ * the workspace stays legible without deleting or moving the source card.
+ */
+body.libtv-surface .libtv-context-ribbon {
+    position: absolute;
+    left: 233px;
+    top: 70px;
+    z-index: 58;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(20px, auto);
+    column-gap: 9px;
+    row-gap: 3px;
+    width: min(760px, calc(100% - 470px));
+    min-width: 320px;
+    max-height: 84px;
+    padding: 8px 10px 8px 9px;
+    overflow: hidden;
+    border: 1px solid rgba(127, 220, 235, .23);
+    border-radius: 11px;
+    color: var(--ltv-text, #f2f4f7);
+    background: linear-gradient(120deg, rgba(13, 22, 28, .96), rgba(19, 22, 32, .94));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .06), 0 0 26px rgba(45, 212, 191, .055);
+    /* The summary is paint-only; only its explicit tabs/action accept input
+       so a source card underneath remains reachable with a pointer. */
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease, border-color .18s ease;
+}
+
+body.libtv-surface .libtv-context-ribbon[hidden] {
+    display: none !important;
+}
+
+body.libtv-surface .libtv-context-ribbon-icon {
+    grid-row: 1 / span 2;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(116, 239, 255, .28);
+    border-radius: 9px;
+    color: #a5f3fc;
+    background: linear-gradient(145deg, rgba(45, 212, 191, .22), rgba(99, 102, 241, .18));
+    box-shadow: 0 0 18px rgba(45, 212, 191, .12);
+}
+
+body.libtv-surface .libtv-context-ribbon-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+body.libtv-surface .libtv-context-ribbon-copy {
+    grid-column: 2;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1.15;
+}
+
+body.libtv-surface .libtv-context-ribbon-kicker {
+    flex: none;
+    color: #78e5ed;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+body.libtv-surface .libtv-context-ribbon-title {
+    min-width: 0;
+    overflow: hidden;
+    color: #f5fbff;
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: .015em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.libtv-surface .libtv-context-ribbon-tabs {
+    grid-column: 2;
+    display: flex;
+    min-width: 0;
+    gap: 4px;
+    overflow: hidden;
+}
+
+body.libtv-surface .libtv-context-ribbon-tab {
+    max-width: 130px;
+    min-height: 18px;
+    padding: 2px 7px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: #8896a7;
+    background: rgba(255, 255, 255, .035);
+    font: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color .15s ease, background .15s ease, border-color .15s ease;
+}
+
+body.libtv-surface .libtv-context-ribbon-tab[aria-selected="true"],
+body.libtv-surface .libtv-context-ribbon-tab:hover,
+body.libtv-surface .libtv-context-ribbon-tab:focus-visible {
+    border-color: rgba(93, 231, 232, .32);
+    color: #d9fcff;
+    background: rgba(45, 212, 191, .14);
+    outline: none;
+}
+
+body.libtv-surface .libtv-context-ribbon-summary {
+    grid-column: 2;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: #a9b5c2;
+    font-size: 10px;
+    font-weight: 560;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+body.libtv-surface .libtv-context-ribbon-focus {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 48px;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid rgba(113, 232, 239, .25);
+    border-radius: 8px;
+    color: #b8f7fb;
+    background: rgba(26, 74, 82, .42);
+    font: inherit;
+    font-size: 9px;
+    font-weight: 760;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color .15s ease, background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+body.libtv-surface .libtv-context-ribbon-focus svg {
+    width: 13px;
+    height: 13px;
+}
+
+body.libtv-surface .libtv-context-ribbon-focus:hover,
+body.libtv-surface .libtv-context-ribbon-focus:focus-visible {
+    border-color: rgba(130, 243, 248, .62);
+    color: #fff;
+    background: rgba(45, 212, 191, .24);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+/* Keep the source prompt in the document and in the tab order, but let the
+   ribbon carry the visual weight until someone points at or enters it. */
+@media (min-width: 901px) {
+    body.libtv-surface .image-node.libtv-context-source {
+        opacity: .17 !important;
+        filter: saturate(.62) brightness(.76) !important;
+        transition: opacity .2s ease, filter .2s ease, box-shadow .2s ease;
+    }
+
+    body.libtv-surface .image-node.libtv-context-source:hover,
+    body.libtv-surface .image-node.libtv-context-source:focus-within,
+    body.libtv-surface .image-node.libtv-context-source.libtv-context-source-active {
+        z-index: 30 !important;
+        opacity: 1 !important;
+        filter: none !important;
+        box-shadow: 0 0 0 1px rgba(93, 231, 232, .48), 0 16px 40px rgba(0, 0, 0, .5) !important;
+    }
+}
+
+@media (max-width: 900px) {
+    /* The product is desktop-first; on narrow embeds keep the original card
+       untouched instead of introducing another layer over the editor. */
+    body.libtv-surface .libtv-context-ribbon {
+        display: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.libtv-surface .libtv-context-ribbon,
+    body.libtv-surface .image-node.libtv-context-source {
+        transition: none !important;
+    }
+}

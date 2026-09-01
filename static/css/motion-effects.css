@@ -1,0 +1,872 @@
+/*
+ * Canvas Lab motion layer
+ *
+ * This file is intentionally loaded after the page-specific stylesheets.  It
+ * only animates paint properties (opacity, transform, shadow and filter), so
+ * it does not change sizing, scroll containers, hit testing or the inline
+ * transforms used by draggable canvas nodes.  The selectors are deliberately
+ * shared by the shell, workspace, asset pages and the standalone director
+ * desk; pages can opt into the small utility hooks at the end as they grow.
+ */
+
+:root {
+    --cl-motion-fast: .14s;
+    --cl-motion-base: .22s;
+    --cl-motion-slow: .42s;
+    --cl-motion-ease: cubic-bezier(.22, .72, .24, 1);
+    --cl-motion-spring: cubic-bezier(.2, .85, .25, 1.2);
+    --cl-motion-shadow: var(--shadow, rgba(20, 33, 31, .14));
+    --cl-motion-shadow-strong: var(--shadow-strong, rgba(20, 33, 31, .22));
+    --cl-motion-sheen: rgba(255, 255, 255, .42);
+}
+
+html.theme-dark,
+html.studio-theme-dark,
+body.theme-dark,
+body.studio-theme-dark {
+    --cl-motion-sheen: rgba(255, 255, 255, .08);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Keyframes                                                                 */
+/* ------------------------------------------------------------------------- */
+
+@keyframes clMotionFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes clMotionFadeOnly {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes clMotionPop {
+    0% { opacity: 0; transform: scale(.97); }
+    70% { opacity: 1; transform: scale(1.012); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes clMotionPulse {
+    0%, 100% { opacity: .72; }
+    50% { opacity: 1; }
+}
+
+@keyframes clMotionGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(15, 118, 110, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(15, 118, 110, .14); }
+}
+
+@keyframes clMotionSoftFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes clMotionSheen {
+    from { background-position: 180% 0; }
+    to { background-position: -20% 0; }
+}
+
+@keyframes clMotionPlayhead {
+    0%, 100% { opacity: .78; filter: drop-shadow(0 0 0 rgba(124, 92, 255, 0)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 4px rgba(124, 92, 255, .5)); }
+}
+
+@keyframes clMotionLoading {
+    0% { background-position: 180% 0; }
+    100% { background-position: -20% 0; }
+}
+
+@keyframes clMotionNudge {
+    0%, 100% { transform: translateX(0); }
+    35% { transform: translateX(-2px); }
+    70% { transform: translateX(2px); }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Desktop page entrance                                                     */
+/* ------------------------------------------------------------------------- */
+
+@media (min-width: 901px) {
+    /* A top-level fade is safe for fixed overlays; the canvas shell is kept
+       opacity-only so it never creates a new containing block for HUDs. */
+    body > .app-shell,
+    body > .workspace {
+        animation: clMotionFadeOnly var(--cl-motion-slow) ease both;
+    }
+
+    /* Settings and utility pages may contain fixed dialogs; keep their
+       entrance opacity-only so those dialogs remain viewport anchored. */
+    body > .page {
+        animation: clMotionFadeOnly var(--cl-motion-slow) ease both;
+    }
+
+    body > .shell {
+        animation: clMotionFadeOnly var(--cl-motion-slow) ease both;
+    }
+
+    body.director-page > .director-topbar {
+        animation: clMotionFadeOnly .34s ease both;
+    }
+
+    body.director-page > .director-main {
+        animation: clMotionFadeOnly .38s ease .04s both;
+    }
+
+    /* Navigation gently acknowledges the pointer without shifting layout. */
+    .sidebar .nav-item,
+    .sidebar .nav-fold-toggle,
+    .sidebar .side-pill,
+    .ws-sidebar .ws-project-row,
+    .ws-sidebar .ws-trash-entry {
+        transition-property: transform, background-color, border-color, color, box-shadow;
+        transition-duration: var(--cl-motion-fast);
+        transition-timing-function: var(--cl-motion-ease);
+    }
+
+    .sidebar .nav-item:hover,
+    .sidebar .nav-fold-toggle:hover,
+    .sidebar .side-pill:hover,
+    .ws-sidebar .ws-project-row:hover,
+    .ws-sidebar .ws-trash-entry:hover {
+        transform: translateX(2px);
+    }
+
+    .sidebar .logo-ring:not(:hover):not(:focus-visible) {
+        animation: clMotionGlow 4.8s ease-in-out 1.1s infinite;
+    }
+
+    .sidebar .brand-lockup-mark,
+    .director-brand-mark {
+        background-image: linear-gradient(110deg, transparent 20%, var(--cl-motion-sheen) 48%, transparent 74%);
+        background-size: 220% 100%;
+        animation: clMotionSheen 5.8s ease-in-out 1.4s infinite;
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Static collections and cards                                               */
+/* ------------------------------------------------------------------------- */
+
+/* Board cards have an inline transform while they are positioned/dragged;
+   fade only here so the animation can never overwrite that transform.  Cut
+   and actively dragged cards are excluded so their state opacity remains the
+   source of truth. */
+.ws-board-world > .ws-card:not(.cut):not(.dragging),
+.ws-trash-list > .ws-trash-card,
+.ws-project-list > .ws-project-row {
+    animation: clMotionFadeOnly .3s var(--cl-motion-ease) both;
+}
+
+.ws-board-world > .ws-card:not(.cut):not(.dragging):nth-child(2),
+.ws-trash-list > .ws-trash-card:nth-child(2),
+.ws-project-list > .ws-project-row:nth-child(2) { animation-delay: .025s; }
+.ws-board-world > .ws-card:not(.cut):not(.dragging):nth-child(3),
+.ws-trash-list > .ws-trash-card:nth-child(3),
+.ws-project-list > .ws-project-row:nth-child(3) { animation-delay: .05s; }
+.ws-board-world > .ws-card:not(.cut):not(.dragging):nth-child(4),
+.ws-trash-list > .ws-trash-card:nth-child(4),
+.ws-project-list > .ws-project-row:nth-child(4) { animation-delay: .075s; }
+.ws-board-world > .ws-card:not(.cut):not(.dragging):nth-child(n+5),
+.ws-trash-list > .ws-trash-card:nth-child(n+5),
+.ws-project-list > .ws-project-row:nth-child(n+5) { animation-delay: .1s; }
+
+.asset-card,
+.asset-manager-card,
+.storage-file-card,
+.canvas-asset-card,
+.prompt-template-card,
+.home-card,
+.home-recent-card,
+.media-file-card,
+.media-video-card,
+.media-audio-card,
+.provider-card,
+.graph-card,
+.comfy-card,
+.minimax-card,
+.loop-smart-card,
+.smart-group-card {
+    transition-property: transform, border-color, background-color, box-shadow, filter;
+    transition-duration: var(--cl-motion-base);
+    transition-timing-function: var(--cl-motion-ease);
+}
+
+.asset-card:hover,
+.asset-manager-card:hover,
+.storage-file-card:hover,
+.canvas-asset-card:hover,
+.prompt-template-card:hover,
+.home-card:hover,
+.home-recent-card:hover,
+.media-file-card:hover,
+.media-video-card:hover,
+.media-audio-card:hover,
+.provider-card:hover,
+.graph-card:hover,
+.comfy-card:hover,
+.minimax-card:hover,
+.loop-smart-card:hover,
+.smart-group-card:hover {
+    filter: brightness(1.012);
+    box-shadow: 0 10px 26px var(--cl-motion-shadow);
+}
+
+/* Avoid making draggable provider cards look like they have moved. */
+.provider-card-sortable.is-dragging,
+.asset-card.dragging,
+.asset-manager-card.dragging,
+.storage-file-card.dragging { filter: none; }
+
+/* ------------------------------------------------------------------------- */
+/* Buttons and compact controls                                               */
+/* ------------------------------------------------------------------------- */
+
+.tool-btn,
+.menu-btn,
+.nav-item,
+.nav-fold-toggle,
+.side-pill,
+.ws-side-add,
+.ws-mini-btn,
+.ws-icon-btn,
+.ws-primary-btn,
+.ws-paste-btn,
+.ws-bulk-btn,
+.ws-pop-item,
+.ws-pop-proj,
+.ws-trash-act,
+.ws-confirm-btn,
+.ws-cancel-btn,
+.ws-create-toggle-btn,
+.ws-create-chip,
+.ws-create-confirm,
+.ws-create-cancel,
+.director-back,
+.director-action,
+.studio-modal-btn,
+.studio-modal-close,
+.studio-contact-close,
+.canvas-asset-icon-btn,
+.asset-manager-tools button,
+.asset-manager-card-actions button,
+.prompt-template-actions button,
+.prompt-template-list-tools button,
+.prompt-template-icon-actions button,
+.vwf-mini,
+.vwf-ibar,
+.vwf-tool,
+.vwf-stage-tab,
+.vwf-stage-card,
+.vwf-kind-card,
+.vwf-desk-open-page {
+    transition-property: transform, border-color, background-color, color, box-shadow, filter;
+    transition-duration: var(--cl-motion-fast);
+    transition-timing-function: var(--cl-motion-ease);
+}
+
+/* Positional controls keep a centering transform in their page stylesheet;
+   do not replace it with the generic press nudge while a click is in flight. */
+button:not(:disabled):not([aria-disabled="true"]):active:not(.link-delete):not(.canvas-video-play):not(.minimap-arrange-btn):not(.minimap-delete-btn),
+a.director-back:active,
+a.vwf-desk-open-page:active {
+    transform: translateY(1px) scale(.985);
+}
+
+.vwf-stage-tab:hover,
+.vwf-tool:hover,
+.vwf-stage-card:hover,
+.vwf-kind-card:hover,
+.vwf-mini:hover,
+.vwf-ibar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 13px var(--cl-motion-shadow);
+}
+
+.vwf-stage-tab.is-on,
+.vwf-tool.is-on,
+.vwf-stage-card.is-on,
+.vwf-mini.is-on,
+.vwf-ibar.is-on {
+    box-shadow: 0 0 0 1px rgba(15, 118, 110, .14), 0 5px 14px var(--cl-motion-shadow);
+}
+
+.vwf-stage .vwf-tree-row,
+.vwf-stage .vwf-actor {
+    transition-property: transform, background-color, border-color, color, box-shadow;
+    transition-duration: var(--cl-motion-fast);
+    transition-timing-function: var(--cl-motion-ease);
+}
+
+.vwf-stage .vwf-tree-row:hover,
+.vwf-stage .vwf-actor:hover {
+    transform: translateX(2px);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Loading and status affordances                                             */
+/* ------------------------------------------------------------------------- */
+
+.director-loading,
+.loading-box,
+.loading-cell,
+.loading-wrap,
+.loading-skeleton,
+.panorama-loading,
+[data-loading="true"],
+[data-status="loading"],
+[aria-busy="true"] {
+    background-image: linear-gradient(105deg, transparent 25%, var(--cl-motion-sheen) 50%, transparent 75%);
+    background-size: 220% 100%;
+    animation: clMotionLoading 1.55s linear infinite;
+}
+
+.director-loading,
+.loading-box,
+.loading-cell,
+.loading-wrap,
+.panorama-loading,
+[data-loading="true"],
+[data-status="loading"] {
+    will-change: background-position;
+}
+
+.director-save-state[data-state="saving"],
+.node-run-status.running,
+.run-status.running,
+.cloud-status.loading,
+.connectivity-status.loading,
+.provider-status-dot.loading {
+    animation: clMotionPulse 1.25s ease-in-out infinite;
+}
+
+.director-save-state[data-state="saved"],
+.node-run-status.done,
+.node-run-status.preview,
+[data-state="success"],
+[data-status="success"] {
+    animation: clMotionPop .3s var(--cl-motion-spring) both;
+}
+
+/* These status elements already use a translate transform for placement
+   (the workspace badge is centered with translateX, while toast uses
+   translateY).  Fade-only entrance keeps that positioning intact. */
+.ws-status.show,
+.toast.show,
+.toast.is-on,
+.director-toast.is-on {
+    animation: clMotionFadeOnly .24s ease both;
+}
+
+.error-panel:not([hidden]),
+[data-state="error"],
+[data-status="error"] {
+    animation: clMotionNudge .26s ease both;
+}
+
+.director-error:not([hidden]) {
+    animation: clMotionFadeOnly .24s ease both;
+}
+
+.director-local-note:not([hidden]),
+.studio-contact-modal:not([hidden]),
+.studio-modal:not([hidden]),
+.ws-bulk-dialog.active,
+.ws-trash-panel.active {
+    /* Keep full-screen hit targets opaque and edge-to-edge while they enter. */
+    animation: clMotionFadeOnly .24s ease both;
+}
+
+.studio-contact-modal:not([hidden]) > .studio-contact-panel,
+.studio-modal:not([hidden]) > .studio-modal-panel,
+.ws-bulk-dialog.active > .ws-bulk-dialog-card {
+    animation: clMotionPop .28s var(--cl-motion-spring) both;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Director desk and timeline                                                 */
+/* ------------------------------------------------------------------------- */
+
+.director-topbar .director-save-state {
+    transition: color var(--cl-motion-base) ease, opacity var(--cl-motion-base) ease;
+}
+
+.vwf-stage .vwf-stage-tab svg,
+.vwf-stage .vwf-tool svg,
+.vwf-stage .vwf-ibar svg {
+    transition: transform var(--cl-motion-fast) var(--cl-motion-ease), opacity var(--cl-motion-fast) ease;
+}
+
+.vwf-stage .vwf-stage-tab:hover svg,
+.vwf-stage .vwf-tool:hover svg,
+.vwf-stage .vwf-ibar:hover svg {
+    transform: scale(1.08);
+}
+
+.vwf-stage .vwf-tl-kf.is-on {
+    animation: clMotionGlow 1.8s ease-in-out infinite;
+}
+
+/* The playhead only glows while playback is active.  :has() is supported by
+   the current desktop Chromium used by the app; no DOM mutation is needed. */
+.vwf-timeline-bar:has([data-tl-play][aria-pressed="true"]) .vwf-tl-now {
+    animation: clMotionPlayhead 1.15s ease-in-out infinite;
+}
+
+.vwf-stage .vwf-desk-open-page:hover,
+.vwf-stage .vwf-desk-exit:hover {
+    filter: brightness(1.035);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Smart-canvas connection layer                                              */
+/* ------------------------------------------------------------------------- */
+
+/* A calm opacity/glow breath keeps the solid base readable. The companion
+   .conn-flow / .conn-flow-glow paths below form the visible fluid highlight:
+   each idle/history/waiting edge stays a continuous tube while its gradient
+   sheen and elongated animateMotion highlight move over the surface. Pending
+   and cascade-active base paths already own a faster dash-flow animation in
+   smart-canvas.css, so the renderer omits a second highlight for those states. */
+.connection-layer .conn-line:not(.conn-pending):not(.conn-cascade-active):not(.conn-cascade-wait):not(.conn-erasing-mark):not(.conn-selected) {
+    animation: clMotionLinePulse 3.6s ease-in-out infinite;
+}
+
+.connection-layer .conn-line.conn-selected:not(.conn-pending):not(.conn-cascade-active):not(.conn-cascade-wait):not(.conn-erasing-mark) {
+    animation: clMotionLineSelected 1.9s ease-in-out infinite;
+}
+
+.connection-layer .conn-end {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clMotionEndpoint 2.4s ease-in-out infinite;
+}
+
+/* Waiting cascade edges stay quiet but still acknowledge that they are part
+   of the active run. */
+.connection-layer .conn-cascade-wait {
+    animation: clMotionLinePulse 1.45s ease-in-out infinite;
+}
+
+/* The connection is a continuous liquid conduit rather than a dotted wire.
+   Three pointer-transparent paint passes provide a soft tube, a saturated
+   colour body and a fine wet highlight. A separate animateMotion sheen
+   (emitted by the renderer) supplies direction and a brief glint. Keeping the
+   sheen separate means the pipe itself never breaks into artificial dashes. */
+.connection-layer .conn-line.conn-output:not(.conn-selected) {
+    stroke: rgba(15, 118, 110, .56);
+}
+.connection-layer .conn-line.conn-input:not(.conn-selected) {
+    stroke: rgba(3, 105, 161, .58);
+}
+.connection-layer .conn-line.conn-history:not(.conn-selected) {
+    stroke: rgba(71, 85, 105, .46);
+}
+/* smart-canvas.css gives history/waiting wires a legacy dash pattern. The new
+   material is a continuous pipe, so clear that pattern for the calm states;
+   pending and actively-cascading states keep their intentional alert dash. */
+.connection-layer .conn-line.conn-history,
+.connection-layer .conn-line.conn-cascade-wait:not(.conn-cascade-active),
+.connection-layer .conn-flow-glow,
+.connection-layer .conn-flow,
+.connection-layer .conn-flow-core {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+}
+.connection-layer .conn-flow-glow,
+.connection-layer .conn-flow,
+.connection-layer .conn-flow-core {
+    pointer-events: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+}
+
+.connection-layer .conn-flow-glow {
+    stroke: var(--conn-flow-gradient, var(--conn-flow-color, #14b8a6));
+    stroke-width: 9px;
+    opacity: .14;
+    filter: drop-shadow(0 0 5px var(--conn-flow-shadow, rgba(20, 184, 166, .72))) blur(.35px);
+    animation: clMotionFluidGlow var(--conn-glow-duration, 2.5s) ease-in-out infinite;
+    animation-delay: var(--conn-glow-delay, -.3s);
+}
+
+.connection-layer .conn-flow {
+    stroke: var(--conn-flow-gradient, var(--conn-flow-color, #14b8a6));
+    stroke-width: 3.8px;
+    /* Keep .9 as a conservative fallback for older imported canvases; the
+       current renderer supplies .96 through the custom property. */
+    opacity: var(--conn-flow-opacity, .9);
+    filter: drop-shadow(0 0 2.5px var(--conn-flow-shadow, rgba(20, 184, 166, .72)));
+    animation: clMotionFluidBody var(--conn-flow-duration, 2.1s) ease-in-out infinite;
+    animation-delay: var(--conn-flow-delay, -.45s);
+}
+
+/* A fine wet highlight keeps the tube dimensional. It is continuous too; the
+   travelling flash is the .conn-flow-spark group below, not a dashed stroke. */
+.connection-layer .conn-flow-core {
+    stroke: var(--conn-flow-core-color, #e6fffb);
+    stroke-width: 1.15px;
+    opacity: .48;
+    filter: drop-shadow(0 0 2.5px var(--conn-flow-shadow, rgba(20, 184, 166, .72)));
+    animation: clMotionFluidCore var(--conn-flow-duration, 2.1s) ease-in-out infinite;
+    animation-duration: var(--conn-flow-duration, 2.1s);
+    animation-delay: calc(var(--conn-flow-delay, -.45s) - .12s);
+}
+
+/* The travelling highlight is intentionally an elongated sheen rather than a
+   round dot/particle.  The tube remains intact and the elongated sheen moves slowly enough
+   to suggest liquid without leaving bright dots on the board. */
+.connection-layer .conn-flow-spark {
+    pointer-events: none;
+    transform-box: fill-box;
+    transform-origin: center;
+    mix-blend-mode: screen;
+}
+.connection-layer .conn-flow-spark-sheen {
+    pointer-events: none;
+    fill: var(--conn-flow-color, #2dd4bf);
+    opacity: .42;
+    filter: drop-shadow(0 0 6px var(--conn-flow-shadow, rgba(20, 184, 166, .76))) blur(.8px);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clMotionSparkSheen 2.2s ease-in-out infinite;
+}
+.connection-layer .conn-flow-spark-streak {
+    pointer-events: none;
+    fill: var(--conn-flow-core-color, #f8ffff);
+    filter: drop-shadow(0 0 4px var(--conn-flow-shadow, rgba(20, 184, 166, .9)));
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clMotionSparkStreak 2s ease-in-out infinite;
+}
+/* A pre-cache-bust tab may still contain the old round/asterisk spark nodes.
+   Suppress those legacy direct children defensively; the current renderer only
+   emits the two elongated ellipse highlights above. Endpoint and delete
+   affordance circles live outside this group and remain interactive. */
+.connection-layer .conn-flow-spark > circle,
+.connection-layer .conn-flow-spark > path {
+    display: none !important;
+}
+.connection-layer .conn-flow-spark-halo {
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px var(--conn-flow-shadow, rgba(20, 184, 166, .8))) blur(.3px);
+    animation: clMotionSparkHalo 1.1s ease-in-out infinite;
+}
+.connection-layer .conn-flow-spark-core {
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--conn-flow-shadow, rgba(20, 184, 166, .9)));
+    animation: clMotionSparkCore 1.1s ease-in-out infinite;
+}
+.connection-layer .conn-flow-spark-flare {
+    pointer-events: none;
+    filter: drop-shadow(0 0 3px #ffffff);
+    animation: clMotionSparkFlare .72s ease-in-out infinite;
+}
+.connection-layer .conn-flow-spark-star {
+    pointer-events: none;
+    stroke: #ffffff;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px #ffffff);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clMotionSparkStar 1.05s ease-in-out infinite;
+}
+
+.connection-layer .conn-flow.conn-input,
+.connection-layer .conn-flow-core.conn-input {
+    filter: drop-shadow(0 0 2px rgba(56, 189, 248, .78));
+}
+.connection-layer .conn-flow.conn-history,
+.connection-layer .conn-flow-core.conn-history {
+    opacity: .78;
+}
+.connection-layer .conn-flow.conn-cascade,
+.connection-layer .conn-flow-core.conn-cascade {
+    filter: drop-shadow(0 0 2px rgba(34, 197, 94, .76));
+}
+
+/* The endpoint is a small liquid meniscus rather than a hard square pin. */
+.connection-layer .conn-end-halo {
+    pointer-events: none;
+    vector-effect: non-scaling-stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clMotionEndpointHalo 2.7s ease-in-out infinite;
+}
+.connection-layer .conn-end-halo.conn-input { stroke: #38bdf8; }
+.connection-layer .conn-end-halo.conn-output { stroke: #2dd4bf; }
+.connection-layer .conn-end-halo.conn-history { stroke: #94a3b8; }
+.connection-layer .conn-end-halo.conn-cascade { stroke: #4ade80; }
+
+/* Keep the canvas clean until a user is actually working on an edge. The hit
+   path supplies hover state, then the compact cut affordance fades in. */
+.connection-layer .conn-cut {
+    pointer-events: none;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity .18s var(--cl-motion-ease), transform .18s var(--cl-motion-ease);
+    transform: scale(.72);
+}
+.connection-layer .conn-cut.conn-hovered,
+.connection-layer .conn-cut.conn-selected {
+    pointer-events: auto;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Waiting/cascade-done edges retain a little more presence than history lines. */
+.connection-layer .conn-flow-glow.conn-cascade-wait,
+.connection-layer .conn-flow-glow.conn-cascade-done {
+    stroke-width: 9px;
+    opacity: .28;
+}
+
+.connection-layer .conn-flow.conn-cascade-wait,
+.connection-layer .conn-flow.conn-cascade-done {
+    stroke-width: 3.8px;
+    opacity: .94;
+}
+
+/* Dense storyboards hide the per-edge gradient paint (the renderer may add up
+   to four aggregate paths for medium dense graphs). Hundreds of independent
+   SVG strokes are materially more expensive than the editor itself; the base
+   remains readable and this fallback keeps panning/dragging responsive. Small
+   and medium graphs retain the full liquid material and spark treatment. */
+.connection-layer.conn-dense-motion .conn-line:not(.conn-pending):not(.conn-cascade-active),
+.connection-layer.conn-dense-motion .conn-end {
+    animation: none !important;
+    filter: none !important;
+}
+.connection-layer.conn-dense-motion .conn-flow-glow {
+    display: none !important;
+}
+.connection-layer .conn-flow-dense {
+    pointer-events: none;
+    vector-effect: non-scaling-stroke;
+    stroke: var(--conn-flow-gradient, var(--conn-flow-color, #14b8a6));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .68;
+    filter: none;
+    animation: clMotionFluidBody var(--conn-flow-duration, 3.2s) ease-in-out infinite;
+    animation-delay: var(--conn-flow-delay, -.45s);
+}
+.connection-layer.conn-dense-motion .conn-flow {
+    /* Individual flow paths stay indexed in the DOM but are not painted. */
+    display: none !important;
+    stroke-width: 2.8px;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: .72;
+    filter: none;
+    animation: clMotionFluidBody 3.2s ease-in-out infinite;
+}
+.connection-layer.conn-dense-motion .conn-flow-core,
+.connection-layer.conn-dense-motion .conn-end-halo,
+.connection-layer.conn-dense-motion .conn-flow-spark {
+    display: none !important;
+}
+.connection-layer.conn-reduce-motion .conn-flow-dense,
+.connection-layer .conn-erasing-mark.conn-flow-dense {
+    display: none !important;
+    animation: none !important;
+}
+
+/* Kept as a compatibility keyframe for imported styles/tests and for legacy
+   pending/cascade paths. Ordinary fluid strokes use the continuous breath
+   keyframes above, so no regular edge is segmented. */
+@keyframes clMotionConnFlow {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -37px; }
+}
+@keyframes clMotionConnCore {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -100px; }
+}
+@keyframes clMotionFluidGlow {
+    0%, 100% { opacity: .10; stroke-width: 8px; }
+    50% { opacity: .22; stroke-width: 10px; }
+}
+@keyframes clMotionSparkSheen {
+    0%, 100% { opacity: .18; transform: scaleX(.72); }
+    50% { opacity: .54; transform: scaleX(1.08); }
+}
+@keyframes clMotionFluidBody {
+    0%, 100% { opacity: .72; }
+    45% { opacity: .98; }
+    58% { opacity: .86; }
+}
+@keyframes clMotionFluidCore {
+    0%, 100% { opacity: .28; }
+    48% { opacity: .68; }
+    62% { opacity: .42; }
+}
+@keyframes clMotionSparkHalo {
+    0%, 100% { opacity: .18; transform: scale(.68); }
+    42% { opacity: .52; transform: scale(1.12); }
+    58% { opacity: .3; transform: scale(.86); }
+}
+@keyframes clMotionSparkCore {
+    0%, 100% { opacity: .58; transform: scale(.78); }
+    44% { opacity: 1; transform: scale(1.16); }
+    62% { opacity: .72; transform: scale(.9); }
+}
+@keyframes clMotionSparkFlare {
+    0%, 100% { opacity: .32; transform: scale(.52); }
+    38% { opacity: 1; transform: scale(1.35); }
+    56% { opacity: .55; transform: scale(.8); }
+}
+@keyframes clMotionSparkStreak {
+    0%, 100% { opacity: .22; transform: scaleX(.56); }
+    36% { opacity: .9; transform: scaleX(1.12); }
+    58% { opacity: .42; transform: scaleX(.82); }
+}
+@keyframes clMotionSparkStar {
+    0%, 100% { opacity: .18; transform: scale(.5); }
+    38% { opacity: .95; transform: scale(1.18); }
+    56% { opacity: .36; transform: scale(.78); }
+}
+@keyframes clMotionEndpointHalo {
+    0%, 100% { opacity: .18; transform: scale(.72); }
+    50% { opacity: .5; transform: scale(1.18); }
+}
+
+/* Erase mode and the renderer's explicit reduced-motion class always win. */
+.connection-layer .conn-erasing-mark.conn-line,
+.connection-layer .conn-erasing-mark.conn-end,
+.connection-layer .conn-erasing-mark.conn-flow,
+.connection-layer .conn-erasing-mark.conn-flow-glow,
+.connection-layer .conn-erasing-mark.conn-flow-core,
+.connection-layer .conn-erasing-mark.conn-end-halo,
+.connection-layer .conn-erasing-mark.conn-flow-spark,
+.connection-layer .conn-erasing-mark.conn-flow-spark-sheen,
+.connection-layer .conn-erasing-mark.conn-flow-spark-streak,
+.connection-layer .conn-erasing-mark.conn-flow-spark-star,
+.connection-layer.conn-reduce-motion .conn-line,
+.connection-layer.conn-reduce-motion .conn-end,
+.connection-layer.conn-reduce-motion .conn-flow,
+.connection-layer.conn-reduce-motion .conn-flow-glow,
+.connection-layer.conn-reduce-motion .conn-flow-core,
+.connection-layer.conn-reduce-motion .conn-end-halo,
+.connection-layer.conn-reduce-motion .conn-flow-spark,
+.connection-layer.conn-reduce-motion .conn-flow-spark-sheen,
+.connection-layer.conn-reduce-motion .conn-flow-spark-streak,
+.connection-layer.conn-reduce-motion .conn-flow-spark-star {
+    animation: none !important;
+    filter: none !important;
+}
+.connection-layer.conn-reduce-motion .conn-flow-spark {
+    display: none !important;
+}
+.connection-layer.conn-reduce-motion animateTransform {
+    display: none !important;
+}
+
+.connection-layer .conn-erasing-mark.conn-flow {
+    stroke: #ef4444 !important;
+    opacity: .42 !important;
+    stroke-dashoffset: 0 !important;
+}
+.connection-layer .conn-erasing-mark.conn-flow-glow {
+    stroke: #ef4444 !important;
+    opacity: .16 !important;
+    stroke-dashoffset: 0 !important;
+}
+.connection-layer .conn-erasing-mark.conn-flow-core {
+    stroke: #fee2e2 !important;
+    opacity: .78 !important;
+    stroke-dashoffset: 0 !important;
+}
+.connection-layer .conn-erasing-mark.conn-end-halo {
+    stroke: #ef4444 !important;
+    opacity: .16 !important;
+}
+
+@keyframes clMotionLinePulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(15, 118, 110, 0)); }
+    50% { filter: drop-shadow(0 0 2.5px rgba(15, 118, 110, .3)); }
+}
+
+@keyframes clMotionLineSelected {
+    0%, 100% { filter: drop-shadow(0 0 1px rgba(15, 118, 110, .16)); }
+    50% { filter: drop-shadow(0 0 5px rgba(15, 118, 110, .5)); }
+}
+
+@keyframes clMotionEndpoint {
+    0%, 100% { transform: scale(.92); filter: drop-shadow(0 0 0 rgba(15, 118, 110, 0)); }
+    50% { transform: scale(1.14); filter: drop-shadow(0 0 3px rgba(15, 118, 110, .38)); }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Empty states and opt-in utility hooks                                      */
+/* ------------------------------------------------------------------------- */
+
+.ws-board-empty-icon,
+.home-empty .empty-state-icon,
+.asset-empty .empty-state-icon,
+.canvas-asset-empty .empty-state-icon,
+.prompt-template-empty .empty-state-icon,
+.detail-empty .empty-state-icon,
+.storage-empty .empty-state-icon,
+.minimap-empty .empty-state-icon,
+.log-empty .empty-state-icon,
+.tree-empty .empty-state-icon,
+.gate-list-empty-icon,
+.rh-empty .empty-state-icon,
+.rh-editor-empty .empty-state-icon,
+.preview-empty .empty-state-icon,
+.model-picker-empty .empty-state-icon {
+    animation: clMotionSoftFloat 3.4s ease-in-out infinite;
+}
+
+.ws-board-empty-icon:hover,
+.gate-list-empty-icon:hover {
+    animation-play-state: paused;
+    box-shadow: 0 14px 30px var(--cl-motion-shadow-strong);
+}
+
+/* Future views can opt into the same language without adding page-specific
+   keyframes.  These hooks intentionally do not set layout properties. */
+[data-motion="float"] { animation: clMotionSoftFloat 3.4s ease-in-out infinite; }
+[data-motion="pulse"] { animation: clMotionPulse 1.25s ease-in-out infinite; }
+[data-motion="sheen"] {
+    background-image: linear-gradient(105deg, transparent 25%, var(--cl-motion-sheen) 50%, transparent 75%);
+    background-size: 220% 100%;
+    animation: clMotionSheen 5.8s ease-in-out infinite;
+}
+[data-motion="enter"] { animation: clMotionFadeIn .34s var(--cl-motion-ease) both; }
+
+/* ------------------------------------------------------------------------- */
+/* Reduced-motion contract                                                    */
+/* ------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        animation-delay: 0ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+        transition-delay: 0ms !important;
+    }
+
+    .connection-layer .conn-flow,
+    .connection-layer .conn-flow-glow,
+    .connection-layer .conn-flow-core,
+    .connection-layer .conn-end-halo {
+        animation: none !important;
+        stroke-dasharray: none !important;
+        stroke-dashoffset: 0 !important;
+        filter: none !important;
+    }
+    .connection-layer .conn-flow-spark { display: none !important; }
+    .connection-layer animateTransform { display: none !important; }
+}

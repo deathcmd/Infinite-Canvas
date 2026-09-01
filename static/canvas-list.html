@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-studio-scale="off">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <title>项目工作台</title>
+    <script>
+        (function(){
+            try {
+                var theme = localStorage.getItem('studio_theme') || localStorage.getItem('canvas_theme') || 'light';
+                if(theme === 'dark') {
+                    document.documentElement.classList.add('studio-theme-dark');
+                    document.documentElement.classList.add('theme-dark');
+                }
+            } catch(e) {}
+        })();
+    </script>
+    <script src="/static/vendor/js/tailwindcss-cdn.js?v=2026.08.27.1787493429"></script>
+    <script src="/static/vendor/js/lucide.js?v=2026.08.27.1787493429"></script>
+    <script src="/static/js/theme.js?v=2026.09.01.ui12"></script>
+    <script src="/static/js/touch-mouse.js?v=2026.09.01.ui12"></script>
+    <script src="/static/js/brand-config.js?v=2026.09.01.brand2"></script>
+    <script src="/static/js/i18n.js?v=2026.09.01.opensource8"></script>
+    <link rel="stylesheet" href="/static/css/canvas-list.css?v=2026.09.01.focus1">
+    <link rel="stylesheet" href="/static/css/theme.css?v=2026.09.01.ui12">
+    <link rel="stylesheet" href="/static/css/brand-theme.css?v=2026.09.01.brand2">
+    <link rel="stylesheet" href="/static/css/motion-effects.css?v=2026.08.31.desktop-motion14">
+    <link rel="stylesheet" href="/static/css/libtv-theme.css?v=2026.09.01.libtv12">
+</head>
+<body class="libtv-surface">
+    <div id="workspace" class="workspace">
+        <!-- LEFT: project sidebar -->
+        <aside id="sidebar" class="ws-sidebar">
+            <!-- Keep the manager aligned with the LibTV editor shell: the
+                 project list is a standalone route, so it needs its own
+                 quiet brand lockup instead of starting with a bare heading. -->
+            <div class="libtv-list-brand-lockup" aria-label="画布实验室">
+                <span class="libtv-list-brand-mark" aria-hidden="true" data-brand-short-name>CL</span>
+                <span class="libtv-list-brand-copy">
+                    <strong data-brand-app-name>画布实验室</strong>
+                    <small>无限画布</small>
+                </span>
+            </div>
+            <div class="ws-side-head">
+                <div class="ws-side-title">项目</div>
+                <button id="newProjectBtn" class="ws-side-add" type="button" title="新建项目" aria-label="新建项目">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div id="newProjectRow" class="ws-newproj-row">
+                <input id="newProjectInput" class="ws-newproj-input" type="text" maxlength="60" placeholder="项目名称" aria-label="新项目名称">
+                <button id="newProjectConfirm" class="ws-mini-btn primary" type="button" title="确定" aria-label="确定"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                <button id="newProjectCancel" class="ws-mini-btn" type="button" title="取消" aria-label="取消"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div id="projectList" class="ws-project-list"></div>
+            <div class="ws-side-foot">
+                <button id="trashEntry" class="ws-trash-entry" type="button">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span class="ws-trash-label">回收站</span>
+                    <span id="trashBadge" class="ws-trash-badge">0</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- RIGHT: board -->
+        <main class="ws-main">
+            <div class="ws-topbar">
+                <div class="ws-topbar-left">
+                    <div id="boardProjectName" class="ws-board-name">默认项目</div>
+                    <span id="boardCanvasCount" class="ws-board-count">0</span>
+                </div>
+                <div class="ws-topbar-right">
+                    <button id="pasteCanvasBtn" class="ws-paste-btn" type="button" title="粘贴到此项目" style="display:none"><i data-lucide="clipboard-paste" class="w-4 h-4"></i><span>粘贴到此项目</span></button>
+                    <button id="boardResetView" class="ws-icon-btn" type="button" title="重置视图" aria-label="重置视图"><i data-lucide="locate-fixed" class="w-4 h-4"></i></button>
+                    <button id="boardRefresh" class="ws-icon-btn" type="button" title="刷新" aria-label="刷新"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                    <button id="newCanvasBtn" class="ws-primary-btn" type="button"><i data-lucide="plus" class="w-4 h-4"></i><span>新建画布</span></button>
+                </div>
+            </div>
+
+            <div id="boardBulkToolbar" class="ws-bulk-toolbar" role="toolbar" aria-label="画布批量操作" hidden>
+                <div class="ws-bulk-summary">
+                    <i data-lucide="check-square" class="w-4 h-4" aria-hidden="true"></i>
+                    <span id="boardSelectionCount">已选 0 个画布</span>
+                </div>
+                <div class="ws-bulk-actions">
+                    <button id="boardSelectAllBtn" class="ws-bulk-btn" type="button" title="选择当前项目全部画布">
+                        <i data-lucide="list-checks" class="w-3.5 h-3.5" aria-hidden="true"></i><span>全选</span>
+                    </button>
+                    <button id="boardClearSelectionBtn" class="ws-bulk-btn" type="button" title="清空当前选择">
+                        <i data-lucide="list-x" class="w-3.5 h-3.5" aria-hidden="true"></i><span>清空</span>
+                    </button>
+                    <button id="boardBulkDeleteBtn" class="ws-bulk-btn danger" type="button" title="将选中的画布移入回收站" disabled>
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5" aria-hidden="true"></i><span>移入回收站</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Board (pan/zoom) -->
+            <div id="board" class="ws-board">
+                <div id="boardWorld" class="ws-board-world"></div>
+                <div id="boardEmptyHint" class="ws-board-empty">
+                    <div class="ws-board-empty-icon"><i data-lucide="mouse-pointer-click" class="w-7 h-7"></i></div>
+                    <div class="ws-board-empty-text">暂无画布</div>
+                    <div class="ws-board-empty-sub">为当前项目创建第一块画布</div>
+                    <div class="ws-board-empty-actions">
+                        <button id="emptyCreateCanvasBtn" class="ws-primary-btn" type="button"><i data-lucide="plus" class="w-4 h-4"></i><span>新建画布</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trash panel (overlay over the board area) -->
+            <div id="trashPanel" class="ws-trash-panel">
+                <div class="ws-trash-head">
+                    <div class="ws-trash-head-title"><i data-lucide="trash-2" class="w-4 h-4"></i><span>回收站</span></div>
+                    <button id="trashClose" class="ws-icon-btn" type="button" title="关闭" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="ws-trash-note"><i data-lucide="info" class="w-3.5 h-3.5"></i><span>回收站中的画布会在 30 天后自动清理。</span></div>
+                <div id="trashBulkToolbar" class="ws-bulk-toolbar ws-trash-bulk-toolbar" role="toolbar" aria-label="回收站批量操作" hidden>
+                    <div class="ws-bulk-summary">
+                        <i data-lucide="check-square" class="w-4 h-4" aria-hidden="true"></i>
+                        <span id="trashSelectionCount">已选 0 个画布</span>
+                    </div>
+                    <div class="ws-bulk-actions">
+                        <button id="trashSelectAllBtn" class="ws-bulk-btn" type="button" title="选择回收站中的全部画布">
+                            <i data-lucide="list-checks" class="w-3.5 h-3.5" aria-hidden="true"></i><span>全选</span>
+                        </button>
+                        <button id="trashClearSelectionBtn" class="ws-bulk-btn" type="button" title="清空当前选择">
+                            <i data-lucide="list-x" class="w-3.5 h-3.5" aria-hidden="true"></i><span>清空</span>
+                        </button>
+                        <button id="trashBulkRestoreBtn" class="ws-bulk-btn success" type="button" title="恢复选中的画布" disabled>
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5" aria-hidden="true"></i><span>批量恢复</span>
+                        </button>
+                        <button id="trashBulkPurgeBtn" class="ws-bulk-btn danger" type="button" title="彻底删除选中的画布" disabled>
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5" aria-hidden="true"></i><span>彻底删除</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="trashList" class="ws-trash-list"></div>
+            </div>
+
+            <div id="bulkConfirmDialog" class="ws-bulk-dialog" hidden>
+                <div class="ws-bulk-dialog-backdrop" data-bulk-dialog-close="true"></div>
+                <section class="ws-bulk-dialog-card" role="dialog" aria-modal="true" aria-labelledby="bulkConfirmTitle" aria-describedby="bulkConfirmMessage" tabindex="-1">
+                    <div class="ws-bulk-dialog-icon" aria-hidden="true"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                    <div class="ws-bulk-dialog-copy">
+                        <h2 id="bulkConfirmTitle">确认批量操作</h2>
+                        <p id="bulkConfirmMessage"></p>
+                    </div>
+                    <div class="ws-bulk-dialog-actions">
+                        <button id="bulkConfirmCancel" class="ws-bulk-dialog-cancel" type="button">取消</button>
+                        <button id="bulkConfirmSubmit" class="ws-bulk-dialog-submit danger" type="button">确认</button>
+                    </div>
+                </section>
+            </div>
+
+            <div id="boardStatus" class="ws-status"></div>
+        </main>
+    </div>
+    <script src="/static/js/canvas-list-layout.js?v=2026.09.01.libtv1"></script>
+    <script src="/static/js/canvas-list.js?v=2026.09.01.layout6"></script>
+    <script src="/static/js/brand-ui.js?v=2026.09.01.brand4"></script>
+    <script src="/static/js/libtv-skin.js?v=2026.09.01.libtv7"></script>
+</body>
+</html>

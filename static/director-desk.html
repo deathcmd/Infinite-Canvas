@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-studio-scale="off">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <title>3D导演台 · 画布实验室</title>
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('studio_theme') || localStorage.getItem('canvas_theme') || 'light';
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('theme-dark');
+                    document.documentElement.classList.add('studio-theme-dark');
+                }
+            } catch (_) {}
+        })();
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+        "three": "/static/vendor/js/three-0.160.0.module.js?v=2026.08.27"
+            }
+        }
+    </script>
+    <script src="/static/vendor/js/lucide.js?v=2026.08.27.1787493429"></script>
+    <script src="/static/js/brand-config.js?v=2026.09.01.brand2"></script>
+    <script src="/static/js/theme.js?v=2026.09.01.ui12"></script>
+    <script src="/static/js/i18n.js?v=2026.09.01.opensource8"></script>
+    <link rel="stylesheet" href="/static/css/canvas.css?v=2026.09.01.canvas3">
+    <link rel="stylesheet" href="/static/css/brand-theme.css?v=2026.09.01.brand2">
+    <link rel="stylesheet" href="/static/css/director-desk.css?v=2026.09.01.director2">
+    <link rel="stylesheet" href="/static/css/motion-effects.css?v=2026.08.31.desktop-motion14">
+    <link rel="stylesheet" href="/static/css/libtv-theme.css?v=2026.09.01.libtv12">
+</head>
+<body class="director-page libtv-surface">
+    <header class="director-topbar">
+        <div class="director-topbar-main">
+            <a id="directorBack" class="director-back" href="/static/canvas-list.html?v=2026.09.01.libtv12">
+                <i data-lucide="arrow-left"></i><span>返回画布</span>
+            </a>
+            <div class="director-brand">
+                <span class="director-brand-mark" data-brand-short-name>CL</span>
+                <span class="director-brand-name" data-brand-app-name>画布实验室</span>
+            </div>
+            <div class="director-title-wrap">
+                <h1 id="directorTitle">3D导演台</h1>
+                <p id="directorSubtitle">独立页面 · 本地状态实时保存</p>
+            </div>
+        </div>
+        <div class="director-topbar-actions">
+            <span id="directorSaveState" class="director-save-state" data-state="saved">准备中</span>
+            <button id="directorThemeToggle" class="director-action" type="button" title="切换主题" aria-label="切换主题">
+                <i data-lucide="sun-moon"></i><span>主题</span>
+            </button>
+        </div>
+    </header>
+    <main class="director-main">
+        <div id="directorLoading" class="director-loading">正在载入导演台…</div>
+        <div id="directorError" class="director-error" hidden>
+            <strong>导演台暂时无法载入</strong>
+            <span id="directorErrorText"></span>
+            <button id="directorRetry" class="director-action" type="button"><i data-lucide="refresh-cw"></i><span>重试</span></button>
+        </div>
+        <div id="directorLocalNote" class="director-local-note" hidden>未连接画布：正在编辑本地草稿，刷新后仍会保留。</div>
+        <div id="directorHost"></div>
+    </main>
+    <div id="directorToast" class="director-toast" role="status" aria-live="polite"></div>
+
+    <script src="/static/js/video-workflow-schema.js?v=2026.09.01.workflow9"></script>
+    <script src="/static/js/video-workflow-adapter.js?v=2026.09.01.workflow9"></script>
+    <script src="/static/js/video-workflow-panel.js?v=2026.09.01.workflow9"></script>
+    <script src="/static/js/director-desk.js?v=2026.09.01.director2"></script>
+    <script src="/static/js/brand-ui.js?v=2026.09.01.brand4"></script>
+</body>
+</html>

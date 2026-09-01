@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <title>创作</title>
+    <script>
+        (function(){
+            try {
+                var theme = localStorage.getItem('studio_theme') || localStorage.getItem('canvas_theme') || 'light';
+                if(theme === 'dark') document.documentElement.classList.add('theme-dark');
+            } catch(e) {}
+        })();
+    </script>
+    <script src="/static/vendor/js/lucide.js?v=2026.08.27.1787493429"></script>
+    <script src="/static/js/brand-config.js?v=2026.09.01.brand2"></script>
+    <script src="/static/js/theme.js?v=2026.09.01.ui12"></script>
+    <link rel="stylesheet" href="/static/css/script-studio.css?v=2026.09.01.studio2">
+    <link rel="stylesheet" href="/static/css/brand-theme.css?v=2026.09.01.brand2">
+    <link rel="stylesheet" href="/static/css/motion-effects.css?v=2026.08.31.desktop-motion14">
+    <link rel="stylesheet" href="/static/css/libtv-theme.css?v=2026.09.01.libtv12">
+    <link rel="stylesheet" href="/static/css/libtv-aux.css?v=2026.09.01.libtv3">
+</head>
+<body class="libtv-surface libtv-aux">
+    <div class="studio" id="studio" data-mode="paste">
+        <section class="pane">
+            <div class="tabs">
+                <button class="tab active" type="button" data-mode="paste">粘贴剧本</button>
+                <button class="tab" type="button" data-mode="ai">一句话写剧本</button>
+            </div>
+            <h1 id="pageTitle">从剧本开始</h1>
+            <p class="lead" id="pageLead">粘贴或上传剧本文本。系统会拆出角色、场景和分镜，再生成一张可编辑的画布。</p>
+            <div class="idea-box">
+                <div class="field">
+                    <span>一句话点子</span>
+                    <input id="ideaInput" type="text" maxlength="200" aria-label="一句话点子" placeholder="例如：客栈雨夜，刺客和镖师第一次对上">
+                </div>
+            </div>
+            <div class="row">
+                <label class="field">
+                    <span>画风</span>
+                    <select id="styleSelect" aria-label="画风">
+                        <option value="2d">2D</option>
+                        <option value="3d">3D</option>
+                        <option value="live">仿真人</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>画幅</span>
+                    <select id="aspectSelect" aria-label="画幅">
+                        <option value="9:16">9:16 竖屏</option>
+                        <option value="16:9">16:9 横屏</option>
+                        <option value="3:4">3:4</option>
+                        <option value="1:1">1:1</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>画布名称</span>
+                    <input id="titleInput" type="text" maxlength="80" aria-label="画布名称" placeholder="可留空，自动用剧本标题">
+                </label>
+            </div>
+            <textarea id="scriptInput" aria-label="剧本文本" placeholder="把剧本贴在这里。支持「角色：」「场景：」、场次标题，以及「张三：台词」这种格式。"></textarea>
+            <div class="actions">
+                <button class="file" type="button" id="uploadBtn">上传文本</button>
+                <input id="fileInput" type="file" accept=".txt,.md,.fountain,.json" aria-label="上传剧本文本文件" hidden>
+                <button class="ghost" type="button" id="parseBtn">拆解剧本</button>
+                <button class="ghost" type="button" id="draftBtn" hidden>生成草稿剧本</button>
+                <button class="primary" type="button" id="createBtn">生成画布</button>
+            </div>
+            <div class="status" id="status"></div>
+        </section>
+        <section class="pane">
+            <h1 style="font-size:18px">拆解结果</h1>
+            <p class="lead">确认角色、场景和分镜后，再生成画布。之后仍可在画布里改提示词和参考图。</p>
+            <div class="summary" id="summary">
+                <div class="empty">还没有拆解结果。先粘贴剧本或生成草稿。</div>
+            </div>
+        </section>
+    </div>
+    <script src="/static/js/script-studio.js?v=2026.09.01.studio4"></script>
+    <script src="/static/js/brand-ui.js?v=2026.09.01.brand4"></script>
+</body>
+</html>

@@ -1,0 +1,930 @@
+/* Canvas Lab brand layer. Loaded after page styles so each view keeps its existing behavior. */
+:root {
+    --cl-ink: #14211f;
+    --cl-ink-2: #20322e;
+    --cl-sidebar: #14211f;
+    --cl-paper: #f5f7f4;
+    --cl-panel: #ffffff;
+    --cl-line: #d7e1dc;
+    --cl-line-strong: #b8c9c1;
+    --cl-muted: #64756f;
+    --cl-faint: #8fa19a;
+    --cl-teal: #0f766e;
+    --cl-teal-strong: #0b5f59;
+    --cl-teal-soft: #dff3ed;
+    --cl-lime: #b8d66b;
+    --cl-orange: #d97745;
+    --cl-blue: #3b6e8f;
+    --cl-danger: #b54a4a;
+    --cl-shadow: rgba(20, 33, 31, .12);
+    --cl-shadow-strong: rgba(20, 33, 31, .2);
+    --page: var(--cl-paper);
+    --panel: rgba(255, 255, 255, .96);
+    --panel-solid: var(--cl-panel);
+    --card: var(--cl-panel);
+    --card-solid: var(--cl-panel);
+    --soft: #eef3ef;
+    --soft-2: #e4ece7;
+    --line: var(--cl-line);
+    --line-2: var(--cl-line-strong);
+    --text: var(--cl-ink);
+    --muted: var(--cl-muted);
+    --faint: var(--cl-faint);
+    --shadow: var(--cl-shadow);
+    --shadow-strong: var(--cl-shadow-strong);
+    --strong: var(--cl-ink);
+    --strong-text: #ffffff;
+    --accent: var(--cl-teal);
+    --accent-soft: var(--cl-teal-soft);
+    --accent-line: #9bcfc4;
+    --success: #2f8f69;
+    --danger: var(--cl-danger);
+    --danger-soft: #fff0ed;
+    --grid: rgba(20, 33, 31, .12);
+}
+
+html.theme-dark,
+html.studio-theme-dark,
+body.theme-dark,
+body.studio-theme-dark {
+    --cl-paper: #101816;
+    --cl-panel: #17231f;
+    --cl-line: #2f443d;
+    --cl-line-strong: #486158;
+    --cl-muted: #a7b9b1;
+    --cl-faint: #7f968d;
+    --cl-ink: #e7f0eb;
+    --cl-ink-2: #d9e6df;
+    --cl-sidebar: #0b1512;
+    --cl-shadow: rgba(0, 0, 0, .28);
+    --cl-shadow-strong: rgba(0, 0, 0, .46);
+    --page: #101816;
+    --panel: rgba(23, 35, 31, .96);
+    --panel-solid: #17231f;
+    --card: #1b2924;
+    --card-solid: #1b2924;
+    --soft: #1f302a;
+    --soft-2: #284039;
+    --line: var(--cl-line);
+    --line-2: var(--cl-line-strong);
+    --text: var(--cl-ink);
+    --muted: var(--cl-muted);
+    --faint: var(--cl-faint);
+    --shadow: var(--cl-shadow);
+    --shadow-strong: var(--cl-shadow-strong);
+    --strong: #d6e9df;
+    --strong-text: #10201b;
+    --accent: #44b7a9;
+    --accent-soft: rgba(68, 183, 169, .16);
+    --accent-line: rgba(68, 183, 169, .42);
+    --danger-soft: rgba(181, 74, 74, .18);
+    --grid: rgba(190, 216, 204, .13);
+}
+
+* { scrollbar-color: var(--cl-line-strong) transparent; }
+button, input, select, textarea { accent-color: var(--cl-teal); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--cl-lime);
+    outline-offset: 2px;
+}
+
+/* Main studio shell */
+.app-shell {
+    background: var(--cl-paper) !important;
+    color: var(--cl-ink);
+}
+.sidebar {
+    width: 76px;
+    min-width: 76px;
+    box-sizing: border-box;
+    padding: 24px 0 18px;
+    background: var(--cl-sidebar) !important;
+    border-right: 0 !important;
+    color: #e7f0eb;
+    box-shadow: 8px 0 28px rgba(20, 33, 31, .1);
+}
+.sidebar:hover { width: 236px; }
+.logo-ring {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--cl-lime) !important;
+    border-radius: 8px;
+    color: var(--cl-lime) !important;
+    background: transparent;
+}
+.logo-ring:hover, .logo-ring:focus-visible {
+    color: var(--cl-ink) !important;
+    border-color: var(--cl-lime) !important;
+    background: var(--cl-lime) !important;
+    box-shadow: 0 0 0 4px rgba(184, 214, 107, .16);
+}
+.logo-ring #logo-dot { background: currentColor !important; }
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 190px;
+    min-height: 40px;
+    margin: -18px 0 18px;
+    padding: 0 12px;
+    color: #e7f0eb;
+    opacity: .98;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+}
+.author-box,
+.social-row-lite,
+#update-now-btn,
+#local-mode-entry-btn,
+.update-source-list { display: none !important; }
+.brand-lockup-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--cl-teal);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .08em;
+}
+.brand-lockup-name {
+    color: #e7f0eb;
+    font-size: 14px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+.nav-item, .nav-fold-toggle {
+    border-radius: 7px !important;
+    color: rgba(231, 240, 235, .64) !important;
+}
+.nav-item:hover, .nav-fold-toggle:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+.nav-item.active {
+    background: var(--cl-teal) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 18px rgba(15, 118, 110, .24);
+}
+.nav-fold-toggle { border-color: rgba(255, 255, 255, .14) !important; }
+.nav-text, .side-pill-text { color: inherit; }
+.side-pill {
+    border-radius: 7px !important;
+    border-color: rgba(255, 255, 255, .14) !important;
+    color: rgba(231, 240, 235, .68) !important;
+    background: transparent !important;
+}
+.side-pill:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: rgba(255, 255, 255, .2) !important;
+}
+.side-pill.active { background: var(--cl-teal) !important; color: #fff !important; border-color: var(--cl-teal) !important; }
+.side-pill.update-available { border-color: var(--cl-lime) !important; color: var(--cl-lime) !important; }
+.project-version-badge {
+    border-radius: 6px !important;
+    color: rgba(231, 240, 235, .6) !important;
+    border-color: rgba(255, 255, 255, .14) !important;
+    background: rgba(255, 255, 255, .04) !important;
+}
+.author-box {
+    border-top: 1px solid rgba(255, 255, 255, .12);
+    color: rgba(231, 240, 235, .68);
+}
+.author-name-lite { color: #e7f0eb !important; }
+.social-row-lite { display: none !important; }
+.author-content-wrap::after {
+    content: "本地优先  ·  自有服务";
+    display: block;
+    margin-top: 7px;
+    color: rgba(231, 240, 235, .54);
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.stage {
+    margin: 12px !important;
+    border-radius: 10px !important;
+    border-color: var(--cl-line) !important;
+    background: var(--cl-paper) !important;
+    box-shadow: 0 10px 30px rgba(20, 33, 31, .08);
+}
+.nano-monitor {
+    border-radius: 7px !important;
+    border-color: var(--cl-line) !important;
+    background: rgba(255, 255, 255, .84) !important;
+    color: var(--cl-ink) !important;
+}
+
+/* Project workspace */
+.workspace { background: var(--cl-paper) !important; }
+.ws-sidebar {
+    flex-basis: 244px;
+    width: 244px;
+    background: var(--cl-sidebar) !important;
+    border-right: 0 !important;
+    color: #e7f0eb;
+    box-shadow: 8px 0 28px rgba(20, 33, 31, .12);
+}
+.ws-side-head { padding: 22px 18px 16px; }
+.ws-side-title { color: #e7f0eb !important; font-size: 16px; letter-spacing: .02em; }
+.ws-side-add {
+    color: #e7f0eb !important;
+    background: rgba(255, 255, 255, .06) !important;
+    border-color: rgba(255, 255, 255, .16) !important;
+    border-radius: 7px !important;
+}
+.ws-side-add:hover { background: var(--cl-teal) !important; border-color: var(--cl-teal) !important; }
+.ws-project-list { padding: 6px 12px 12px; }
+.ws-project-row { border-radius: 7px !important; color: rgba(231, 240, 235, .72); }
+.ws-project-row:hover { background: rgba(255, 255, 255, .08) !important; }
+.ws-project-row.active { background: var(--cl-teal) !important; box-shadow: 0 8px 18px rgba(15, 118, 110, .24) !important; }
+.ws-project-name, .ws-project-icon { color: inherit !important; }
+.ws-project-count { background: rgba(255, 255, 255, .1) !important; color: rgba(231, 240, 235, .7) !important; }
+.ws-project-row.active .ws-project-count { background: rgba(255, 255, 255, .18) !important; color: #fff !important; }
+.ws-side-foot { border-top-color: rgba(255, 255, 255, .12) !important; background: transparent !important; }
+.ws-trash-entry { color: rgba(231, 240, 235, .62) !important; border-color: transparent !important; border-radius: 7px !important; }
+.ws-trash-entry:hover { color: #fff !important; background: rgba(255, 255, 255, .08) !important; }
+.ws-main { background: var(--cl-paper); }
+.ws-topbar {
+    min-height: 66px;
+    padding: 12px 20px;
+    background: var(--cl-panel) !important;
+    border-bottom-color: var(--cl-line) !important;
+    box-shadow: 0 2px 10px rgba(20, 33, 31, .04);
+}
+.ws-board-name { color: var(--cl-ink) !important; }
+.ws-board-count { background: var(--cl-teal-soft) !important; color: var(--cl-teal-strong) !important; }
+.ws-icon-btn, .ws-primary-btn, .ws-paste-btn { border-radius: 7px !important; }
+.ws-icon-btn { color: var(--cl-muted) !important; background: var(--cl-panel) !important; border-color: var(--cl-line) !important; }
+.ws-icon-btn:hover { color: var(--cl-teal) !important; border-color: var(--cl-accent-line, var(--cl-line-strong)) !important; background: var(--cl-teal-soft) !important; }
+.ws-primary-btn { background: var(--cl-teal) !important; color: #fff !important; box-shadow: 0 8px 18px rgba(15, 118, 110, .2) !important; }
+.ws-primary-btn:hover { background: var(--cl-teal-strong) !important; }
+.ws-paste-btn { background: var(--cl-orange) !important; box-shadow: 0 8px 18px rgba(217, 119, 69, .2) !important; }
+.ws-board {
+    background-color: var(--cl-paper) !important;
+    background-image: radial-gradient(var(--cl-line) 1px, transparent 1px) !important;
+    background-size: 26px 26px !important;
+}
+.ws-board-empty-icon, .ws-card, .ws-card-pop, .ws-create-card { border-radius: 8px !important; }
+.ws-board-empty-icon { border-color: var(--cl-line) !important; color: var(--cl-teal) !important; }
+.ws-board-empty-text { color: var(--cl-ink) !important; }
+.ws-card { box-shadow: 0 8px 22px rgba(20, 33, 31, .08) !important; }
+.ws-card:hover { border-color: var(--cl-teal) !important; box-shadow: 0 16px 32px rgba(20, 33, 31, .14) !important; }
+.ws-card-kind.smart { background: var(--cl-teal-soft) !important; color: var(--cl-teal-strong) !important; border-color: #b9ded4 !important; }
+.ws-card-icon.icon-has-color { background: var(--cl-teal) !important; }
+
+/* Infinite canvas editor */
+.shell { background: var(--cl-paper) !important; }
+.topbar { padding: 12px 16px !important; }
+.panel, .canvas-nav, .toolbar {
+    border-radius: 8px !important;
+    border-color: var(--cl-line) !important;
+    background: rgba(255, 255, 255, .94) !important;
+    box-shadow: 0 8px 24px rgba(20, 33, 31, .08) !important;
+}
+.canvas-nav { min-height: 48px; }
+.current-canvas-title { color: var(--cl-ink) !important; font-weight: 850 !important; }
+.current-canvas-time { color: var(--cl-muted) !important; }
+.tool-btn {
+    border-radius: 7px !important;
+    border-color: var(--cl-line) !important;
+    color: var(--cl-muted) !important;
+    background: var(--cl-panel) !important;
+}
+.tool-btn:hover { color: var(--cl-teal) !important; background: var(--cl-teal-soft) !important; border-color: #acd8cd !important; }
+.toolbar-run, .run-btn, .gen-btn, .comfy-run, .llm-run { background: var(--cl-teal) !important; color: #fff !important; border-color: var(--cl-teal) !important; }
+.toolbar-run:hover, .run-btn:hover, .gen-btn:hover, .comfy-run:hover, .llm-run:hover { background: var(--cl-teal-strong) !important; }
+.board {
+    background-color: var(--cl-paper) !important;
+    background-image: radial-gradient(var(--cl-line) 1px, transparent 1px) !important;
+    background-size: 26px 26px !important;
+}
+.node {
+    border-radius: 8px !important;
+    border-color: var(--cl-line) !important;
+    background: var(--cl-panel) !important;
+    box-shadow: 0 12px 28px rgba(20, 33, 31, .1) !important;
+}
+.node::before { border-radius: 8px !important; background: var(--cl-panel) !important; }
+.node-head { border-radius: 8px 8px 0 0 !important; border-bottom-color: var(--cl-line) !important; background: var(--cl-panel) !important; }
+.node-title { color: var(--cl-teal-strong) !important; letter-spacing: .08em !important; }
+.node.selected { outline-color: var(--cl-teal) !important; }
+.create-menu, .workflow-transfer-panel, .asset-manager-panel, .log-panel, .prompt-template-panel, .image-edit-panel, .output-lightbox-shell {
+    border-radius: 8px !important;
+    border-color: var(--cl-line) !important;
+    background: var(--cl-panel) !important;
+    box-shadow: 0 24px 54px rgba(20, 33, 31, .18) !important;
+}
+.menu-btn:hover, .asset-mini-btn:hover, .preview-icon-btn:hover { color: var(--cl-teal) !important; background: var(--cl-teal-soft) !important; }
+.minimap, .smart-minimap { border-radius: 7px !important; border-color: var(--cl-line) !important; }
+
+/* Smart canvas */
+.smart-title { color: var(--cl-ink) !important; font-weight: 900 !important; letter-spacing: .01em !important; }
+.smart-back, .smart-workflow-toggle, .smart-shortcut-toggle, .smart-log-toggle, .asset-toggle, .minimap-arrange-btn {
+    border-radius: 7px !important;
+    border-color: var(--cl-line) !important;
+    background: var(--cl-panel) !important;
+    color: var(--cl-muted) !important;
+    box-shadow: 0 8px 18px rgba(20, 33, 31, .08) !important;
+}
+.smart-back:hover, .smart-workflow-toggle:hover, .smart-shortcut-toggle:hover, .smart-log-toggle:hover, .asset-toggle:hover, .minimap-arrange-btn:hover { color: var(--cl-teal) !important; background: var(--cl-teal-soft) !important; }
+.composer-card { border-radius: 8px !important; border-color: var(--cl-line) !important; background: var(--cl-panel) !important; box-shadow: 0 18px 38px rgba(20, 33, 31, .12) !important; }
+.composer-head, .prompt-row, .param-row { border-color: var(--cl-line) !important; }
+.prompt-input { border-radius: 7px !important; border-color: var(--cl-line) !important; background: var(--cl-paper) !important; }
+.prompt-input:focus { border-color: var(--cl-teal) !important; box-shadow: 0 0 0 3px var(--cl-teal-soft) !important; }
+.run-btn { border-radius: 7px !important; box-shadow: 0 10px 22px rgba(15, 118, 110, .24) !important; }
+.asset-panel, .workflow-transfer-panel { border-radius: 8px !important; border-color: var(--cl-line) !important; background: var(--cl-panel) !important; }
+.asset-title, .workflow-transfer-title { color: var(--cl-ink) !important; }
+.asset-tab.active, .kind-toggle button.active { color: var(--cl-teal-strong) !important; background: var(--cl-teal-soft) !important; border-color: #b9ded4 !important; }
+.create-card { border-radius: 8px !important; border-color: var(--cl-line) !important; background: var(--cl-panel) !important; }
+.create-card:hover { border-color: var(--cl-teal) !important; background: var(--cl-teal-soft) !important; }
+
+/* Project-owned identity block. The previous upstream author/social block is
+   intentionally not reused; this card is populated from brand-config.js. */
+.studio-owner-card {
+    width:calc(100% - 20px);
+    margin:8px 10px 0;
+    padding:9px 8px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    background:rgba(255,255,255,.045);
+    color:#e7f0eb;
+    transition:background .18s ease, border-color .18s ease;
+}
+.studio-owner-card:hover { background:rgba(255,255,255,.08); border-color:rgba(184,214,107,.34); }
+.studio-owner-main { display:flex; align-items:center; gap:8px; min-width:0; }
+.studio-owner-avatar { width:28px; height:28px; flex:0 0 28px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; background:var(--cl-lime); color:var(--cl-ink); font-size:10px; font-weight:950; letter-spacing:.04em; }
+.studio-owner-copy { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.studio-owner-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#fff; font-size:11px; font-weight:850; }
+.studio-owner-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:rgba(231,240,235,.6); font-size:9px; font-weight:650; }
+.studio-owner-contact { width:100%; min-height:27px; display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid rgba(184,214,107,.32); border-radius:7px; background:rgba(184,214,107,.1); color:var(--cl-lime); cursor:pointer; font:inherit; font-size:10px; font-weight:850; transition:background .15s ease, color .15s ease, transform .15s ease; }
+.studio-owner-contact:hover { background:var(--cl-lime); color:var(--cl-ink); transform:translateY(-1px); }
+.studio-owner-contact svg { width:13px; height:13px; flex:0 0 auto; }
+.sidebar:not(:hover):not(.is-pinned) .brand-lockup { width:44px; min-width:44px; justify-content:center; gap:0; padding-inline:0; }
+.sidebar:not(:hover):not(.is-pinned) .brand-lockup-name { display:none; }
+.sidebar:not(:hover):not(.is-pinned) .studio-owner-card { width:44px; align-items:center; padding:7px 5px; }
+.sidebar:not(:hover):not(.is-pinned) .studio-owner-copy { display:none; }
+.sidebar:not(:hover):not(.is-pinned) .studio-owner-main { justify-content:center; }
+.sidebar:not(:hover):not(.is-pinned) .studio-owner-contact { width:28px; padding:0; }
+.sidebar:not(:hover):not(.is-pinned) .studio-owner-contact span { display:none; }
+.studio-contact-modal { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:22px; background:rgba(7,16,14,.56); backdrop-filter:blur(10px); }
+.studio-contact-modal[hidden] { display:none; }
+.studio-contact-panel { width:min(430px, 100%); padding:22px; border:1px solid var(--cl-line-strong); border-radius:18px; background:var(--panel-solid); color:var(--text); box-shadow:0 28px 80px rgba(7,16,14,.34); }
+.studio-contact-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.studio-contact-kicker { display:block; color:var(--accent); font-size:9px; font-weight:900; letter-spacing:.16em; }
+.studio-contact-head h2 { margin:5px 0 0; color:var(--text); font-size:21px; font-weight:900; letter-spacing:-.02em; }
+.studio-contact-close { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:9px; background:var(--soft); color:var(--muted); cursor:pointer; }
+.studio-contact-close:hover { color:var(--text); border-color:var(--line-2); }
+.studio-contact-close svg { width:15px; height:15px; }
+.studio-contact-intro { margin:14px 0 16px; color:var(--muted); font-size:12px; line-height:1.7; }
+.studio-contact-list { display:flex; flex-direction:column; gap:8px; }
+.studio-contact-row { min-height:52px; display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--line); border-radius:11px; background:var(--soft); color:var(--text); text-decoration:none; transition:border-color .15s ease, background .15s ease, transform .15s ease; }
+a.studio-contact-row:hover { border-color:var(--accent-line); background:var(--accent-soft); transform:translateY(-1px); }
+.studio-contact-icon { width:30px; height:30px; flex:0 0 30px; display:inline-flex; align-items:center; justify-content:center; border-radius:9px; background:var(--panel-solid); color:var(--accent); }
+.studio-contact-icon svg { width:16px; height:16px; }
+.studio-contact-copy { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.studio-contact-copy strong { color:var(--text); font-size:11px; font-weight:850; }
+.studio-contact-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:11px; font-weight:650; }
+.studio-contact-arrow { margin-left:auto; color:var(--accent); font-size:15px; font-weight:900; }
+.studio-contact-empty { padding:13px; border:1px dashed var(--line-2); border-radius:11px; color:var(--muted); background:var(--soft); font-size:11px; line-height:1.6; }
+.studio-contact-foot { margin-top:15px; color:var(--faint); font-size:10px; line-height:1.5; }
+body.studio-contact-open { overflow:hidden; }
+.studio-contact-launcher {
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:120;
+    min-height:36px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:0 12px;
+    border:1px solid var(--cl-line-strong);
+    border-radius:999px;
+    background:var(--cl-ink);
+    color:#fff;
+    box-shadow:0 12px 28px rgba(20,33,31,.24);
+    cursor:pointer;
+    font:inherit;
+    font-size:11px;
+    font-weight:850;
+    transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.studio-contact-launcher:hover { background:var(--cl-teal-strong); transform:translateY(-1px); box-shadow:0 16px 32px rgba(20,33,31,.28); }
+.studio-contact-launcher:focus-visible { outline:2px solid var(--cl-lime); outline-offset:3px; }
+.studio-contact-launcher svg { width:15px; height:15px; flex:0 0 auto; }
+@media (max-width:760px) {
+    .studio-contact-launcher { right:12px; bottom:12px; min-height:34px; padding:0 10px; }
+}
+
+/* Make the shell read as a deliberate workspace: clear separation between
+   navigation, canvas content and utility controls at every viewport size. */
+.stage::before { content:""; position:absolute; inset:0; pointer-events:none; border:1px solid rgba(255,255,255,.18); border-radius:inherit; z-index:2; }
+.stage iframe { z-index:1; }
+@media (max-width:760px) {
+    .studio-owner-card { width:calc(100% - 12px); margin-inline:6px; padding:7px 5px; }
+    .studio-owner-copy small, .studio-owner-contact span { display:none; }
+    .studio-owner-contact { min-height:25px; }
+}
+
+/* Remove legacy remote-update surface from the local/open build. */
+#project-update-modal,
+#update-now-btn,
+[data-update-source],
+#update-source-list { display: none !important; }
+
+@media (max-width: 860px) {
+    .sidebar { width: 64px; min-width: 64px; }
+    .sidebar:hover { width: 64px; }
+    .sidebar:hover .brand-lockup-name,
+    .sidebar:hover .nav-text,
+    .sidebar:hover .side-pill-text { opacity: 0; }
+    .stage { margin: 8px !important; }
+    .ws-sidebar { flex-basis: 206px; width: 206px; }
+    .ws-topbar { padding: 10px 12px; }
+    .ws-board-name { max-width: 45vw; }
+    .topbar { left: 8px !important; right: 8px !important; top: 8px !important; }
+}
+@media (max-width: 620px) {
+    .ws-sidebar { flex-basis: 52px; width: 52px; }
+    .ws-side-title, .ws-project-name, .ws-project-count, .ws-trash-label { display: none; }
+    .ws-side-head { justify-content: center; padding: 14px 8px; }
+    .ws-project-list { padding-inline: 6px; }
+    .ws-project-row { justify-content: center; padding-inline: 6px; }
+    .ws-side-foot { padding: 8px 6px; }
+    .ws-trash-entry { justify-content: center; }
+    .ws-primary-btn span, .ws-paste-btn span { display: none; }
+    .ws-primary-btn, .ws-paste-btn { width: 36px; padding: 0; }
+    .toolbar { max-width: calc(100vw - 20px) !important; }
+    .canvas-nav-meta { max-width: 44vw; }
+    .current-canvas-title { font-size: 12px !important; }
+    .composer-card { width: min(94vw, 520px) !important; }
+}
+
+/*
+ * Narrow workbench readability
+ * ----------------------------
+ * The original shell uses :hover to expand the rail and fades all labels in
+ * the collapsed state.  That works with a mouse, but on a touch panel (and
+ * in a narrow embedded browser) there is no reliable hover target, so the
+ * navigation becomes a row of unlabeled icons.  Keep the expanded rail at
+ * phone/tablet widths and make every label a real, non-animated text node.
+ * At very narrow widths the rail becomes a horizontally scrollable top bar;
+ * this leaves the stage a usable width and prevents CJK text from being laid
+ * out one glyph per line.
+ */
+@media (max-width: 860px) {
+    body > .app-shell > .sidebar,
+    body > .app-shell > .sidebar:hover {
+        width: min(220px, calc(100vw - 24px)) !important;
+        min-width: min(220px, calc(100vw - 24px)) !important;
+        transition: none !important;
+    }
+    body > .app-shell > .sidebar .brand-lockup,
+    body > .app-shell > .sidebar:hover .brand-lockup {
+        width: calc(100% - 20px) !important;
+        min-width: 0 !important;
+        justify-content: flex-start !important;
+        gap: 10px !important;
+        padding-inline: 12px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    body > .app-shell > .sidebar .brand-lockup-name,
+    body > .app-shell > .sidebar:hover .brand-lockup-name {
+        display: inline !important;
+        opacity: 1 !important;
+        max-width: 150px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    body > .app-shell > .sidebar .nav-item,
+    body > .app-shell > .sidebar:hover .nav-item,
+    body > .app-shell > .sidebar .nav-fold-toggle,
+    body > .app-shell > .sidebar:hover .nav-fold-toggle {
+        width: calc(100% - 20px) !important;
+        min-width: 0 !important;
+        height: 42px !important;
+        flex-basis: 42px !important;
+        margin: 5px 0 !important;
+        padding-left: 14px !important;
+        justify-content: flex-start !important;
+    }
+    body > .app-shell > .sidebar .nav-text,
+    body > .app-shell > .sidebar:hover .nav-text {
+        display: inline-block !important;
+        opacity: 1 !important;
+        max-width: calc(100% - 42px) !important;
+        margin-left: 10px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        transition: none !important;
+    }
+    body > .app-shell > .sidebar .nav-fold-group,
+    body > .app-shell > .sidebar:hover .nav-fold-group {
+        width: 100% !important;
+        align-items: center !important;
+    }
+    body > .app-shell > .sidebar .side-actions,
+    body > .app-shell > .sidebar:hover .side-actions {
+        width: 100% !important;
+        margin-top: auto !important;
+        align-items: center !important;
+    }
+    body > .app-shell > .sidebar .side-pill,
+    body > .app-shell > .sidebar:hover .side-pill {
+        width: calc(100% - 20px) !important;
+        min-width: 0 !important;
+        gap: 8px !important;
+        justify-content: flex-start !important;
+        padding-inline: 14px !important;
+        transition: none !important;
+    }
+    body > .app-shell > .sidebar .side-pill-text,
+    body > .app-shell > .sidebar:hover .side-pill-text {
+        display: inline-block !important;
+        opacity: 1 !important;
+        max-width: calc(100% - 42px) !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        transition: none !important;
+    }
+    body > .app-shell > .sidebar .settings-fold-chevron,
+    body > .app-shell > .sidebar:hover .settings-fold-chevron {
+        opacity: .72 !important;
+        max-width: 16px !important;
+    }
+    body > .app-shell > .sidebar .project-version-badge,
+    body > .app-shell > .sidebar:hover .project-version-badge {
+        width: calc(100% - 20px) !important;
+        min-width: 0 !important;
+        margin-inline: 0 !important;
+    }
+    body > .app-shell > .sidebar .project-version-compact,
+    body > .app-shell > .sidebar:hover .project-version-compact {
+        display: none !important;
+    }
+    body > .app-shell > .sidebar .project-version-full,
+    body > .app-shell > .sidebar:hover .project-version-full {
+        display: inline !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-card,
+    body > .app-shell > .sidebar:hover .studio-owner-card {
+        width: calc(100% - 20px) !important;
+        margin-inline: 10px !important;
+        align-items: stretch !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-copy,
+    body > .app-shell > .sidebar:hover .studio-owner-copy {
+        display: flex !important;
+        flex: 1 1 auto !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-main,
+    body > .app-shell > .sidebar:hover .studio-owner-main {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-contact span,
+    body > .app-shell > .sidebar:hover .studio-owner-contact span {
+        display: inline !important;
+        max-width: 100% !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-contact,
+    body > .app-shell > .sidebar:hover .studio-owner-contact {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding-inline: 8px !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-copy strong,
+    body > .app-shell > .sidebar .studio-owner-copy small {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-copy small {
+        display: block !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Keep the stage wide enough for normal words and make the rail swipeable. */
+    body > .app-shell {
+        display: block !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    body > .app-shell > .sidebar,
+    body > .app-shell > .sidebar:hover {
+        position: absolute !important;
+        inset: 0 0 auto 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 64px !important;
+        max-height: 64px !important;
+        padding: 6px 8px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        zoom: 1 !important;
+        scrollbar-width: none !important;
+    }
+    body > .app-shell > .sidebar::-webkit-scrollbar { display: none !important; }
+    body > .app-shell > .sidebar > .logo-ring,
+    body > .app-shell > .sidebar:hover > .logo-ring {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        margin: 0 !important;
+        border-radius: 9px !important;
+        transform: none !important;
+    }
+    body > .app-shell > .sidebar > .brand-lockup,
+    body > .app-shell > .sidebar:hover > .brand-lockup {
+        width: auto !important;
+        min-width: 34px !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        justify-content: center !important;
+    }
+    body > .app-shell > .sidebar .brand-lockup-name,
+    body > .app-shell > .sidebar:hover .brand-lockup-name {
+        display: none !important;
+    }
+    body > .app-shell > .sidebar > nav,
+    body > .app-shell > .sidebar:hover > nav {
+        width: auto !important;
+        min-width: 0 !important;
+        height: 52px !important;
+        /* Do not let the wide utility group shrink this rail to zero.  The
+           whole header is intentionally scrollable, so each group keeps its
+           intrinsic width and remains reachable with a swipe. */
+        flex: 0 0 auto !important;
+        max-width: none !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding: 0 !important;
+        scrollbar-width: none !important;
+    }
+    body > .app-shell > .sidebar > nav::-webkit-scrollbar { display: none !important; }
+    body > .app-shell > .sidebar > nav > * {
+        flex: 0 0 auto !important;
+    }
+    body > .app-shell > .sidebar > nav > div[style] {
+        width: 1px !important;
+        height: 24px !important;
+        margin: 0 4px !important;
+    }
+    body > .app-shell > .sidebar .nav-item,
+    body > .app-shell > .sidebar:hover .nav-item,
+    body > .app-shell > .sidebar .nav-fold-toggle,
+    body > .app-shell > .sidebar:hover .nav-fold-toggle {
+        width: auto !important;
+        min-width: max-content !important;
+        height: 38px !important;
+        flex: 0 0 auto !important;
+        margin: 0 2px !important;
+        padding: 0 10px !important;
+        border-radius: 9px !important;
+        gap: 6px !important;
+    }
+    body > .app-shell > .sidebar .nav-text,
+    body > .app-shell > .sidebar:hover .nav-text {
+        display: inline-block !important;
+        opacity: 1 !important;
+        max-width: 9em !important;
+        margin-left: 0 !important;
+        overflow: visible !important;
+        transition: none !important;
+    }
+    body > .app-shell > .sidebar .nav-fold-group,
+    body > .app-shell > .sidebar:hover .nav-fold-group {
+        width: auto !important;
+        max-height: none !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+    }
+    body > .app-shell > .sidebar .side-actions,
+    body > .app-shell > .sidebar:hover .side-actions {
+        width: auto !important;
+        flex: 0 0 auto !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        margin: 0 !important;
+        gap: 4px !important;
+    }
+    body > .app-shell > .sidebar .side-pill,
+    body > .app-shell > .sidebar:hover .side-pill {
+        width: auto !important;
+        min-width: max-content !important;
+        height: 36px !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0 9px !important;
+        gap: 6px !important;
+    }
+    body > .app-shell > .sidebar .side-pill-text,
+    body > .app-shell > .sidebar:hover .side-pill-text {
+        display: inline-block !important;
+        opacity: 1 !important;
+        max-width: 10em !important;
+        overflow: visible !important;
+    }
+    body > .app-shell > .sidebar .settings-fold-group,
+    body > .app-shell > .sidebar:hover .settings-fold-group {
+        width: auto !important;
+        max-height: none !important;
+        flex-direction: row !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        pointer-events: auto !important;
+    }
+    body > .app-shell > .sidebar .settings-fold-chevron,
+    body > .app-shell > .sidebar:hover .settings-fold-chevron,
+    body > .app-shell > .sidebar .project-version-badge,
+    body > .app-shell > .sidebar:hover .project-version-badge {
+        display: none !important;
+    }
+    body > .app-shell > .sidebar .studio-owner-card,
+    body > .app-shell > .sidebar:hover .studio-owner-card {
+        display: none !important;
+    }
+    body > .app-shell > .stage {
+        position: absolute !important;
+        inset: 72px 8px 8px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        border-radius: 10px !important;
+    }
+    body > .app-shell > .stage iframe {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* The project manager is a standalone page as well as an iframe route.  Its
+ * legacy scale opt-out rules intentionally keep a desktop two-pane layout,
+ * but that leaves the board at zero width on phones.  Reflow the manager
+ * before the board is painted: projects become a horizontal strip, the
+ * toolbar stays one readable row, and the board gets the remaining height. */
+@media (max-width: 760px) {
+    html[data-studio-scale="off"].studio-scale-managed body > .workspace,
+    html[data-studio-scale="off"] .workspace {
+        width: 100% !important;
+        height: 100vh !important;
+        min-height: 0 !important;
+        flex-direction: column !important;
+        zoom: 1 !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        max-height: 146px !important;
+        min-height: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--line) !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-side-head {
+        min-height: 48px;
+        padding: 8px 12px 6px !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-side-title,
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-project-name,
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-project-count,
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-trash-label {
+        display: block !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-project-count {
+        display: inline-flex !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-project-list {
+        flex: 0 0 auto !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        padding: 4px 10px 8px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-project-row {
+        flex: 0 0 auto !important;
+        min-width: 148px !important;
+        min-height: 40px !important;
+        padding: 8px 10px !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-side-foot {
+        padding: 4px 10px 8px !important;
+        border-top: 0 !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-sidebar .ws-trash-entry {
+        min-height: 32px !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        flex: 1 1 auto !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-topbar {
+        min-height: 54px !important;
+        padding: 9px 10px !important;
+        gap: 8px !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-topbar-left {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-topbar-right {
+        flex: 0 0 auto !important;
+        gap: 5px !important;
+        flex-wrap: nowrap !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-board-name {
+        max-width: 42vw !important;
+        font-size: 14px !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-primary-btn,
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-paste-btn,
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-icon-btn {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-primary-btn span,
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-paste-btn span {
+        display: none !important;
+    }
+    html[data-studio-scale="off"] .workspace > .ws-main .ws-board {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* API settings is a standalone form page, not the collapsible studio shell.
+ * The brand layer intentionally styles the shell's `.sidebar`, so restore the
+ * form page's grid item after those generic rules.  Without this scope the
+ * provider cards collapse to the 76px shell rail and their labels are clipped.
+ */
+.page > .wrap > .layout > .sidebar,
+.page > .wrap > .layout > .sidebar:hover {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 16px !important;
+    background: var(--panel) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px var(--shadow) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: sticky !important;
+}
+.page > .wrap > .layout > .sidebar .provider-list {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+.page > .wrap > .layout > .sidebar .provider-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+@media (max-width: 860px) {
+    .page > .wrap > .layout > .sidebar,
+    .page > .wrap > .layout > .sidebar:hover {
+        position: static !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}

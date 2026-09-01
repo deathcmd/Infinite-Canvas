@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>导演台对照</title>
+    <script type="importmap">
+        { "imports": { "three": "/static/vendor/js/three-0.160.0.module.js?v=2026.08.27" } }
+    </script>
+    <script src="/static/js/i18n.js?v=2026.09.01.opensource8"></script>
+    <link rel="stylesheet" href="/static/css/canvas.css?v=2026.09.01.canvas3">
+    <style>
+        html, body { margin:0; height:100%; background:#e8edf3; }
+        #host { height:100vh; }
+    </style>
+    <link rel="stylesheet" href="/static/css/motion-effects.css?v=2026.08.31.desktop-motion14">
+    <link rel="stylesheet" href="/static/css/libtv-theme.css?v=2026.09.01.libtv12">
+</head>
+<body class="libtv-surface">
+    <div id="host"></div>
+    <script src="/static/js/video-workflow-schema.js?v=2026.09.01.workflow9"></script>
+    <script src="/static/js/video-workflow-adapter.js?v=2026.09.01.workflow9"></script>
+    <script src="/static/js/video-workflow-panel.js?v=2026.09.01.workflow9"></script>
+    <script>
+        const schema = window.VideoWorkflowSchema;
+        let stage = schema.defaultStage();
+        const actor = schema.normalizeActor({ name: '角色1', x: 0.5, y: 0.5, facing: 0, action: '站立等待', posePreset: 'tpose' }, 0);
+        schema.applyPosePreset(actor, 'tpose');
+        stage.actors = [actor];
+        stage.libraryTab = 'object';
+        stage.viewMode = '3d';
+        const host = document.getElementById('host');
+        host._vwfDesk = true;
+        host._vwfSelected = actor.id;
+        window.VideoWorkflowPanel.mountStage(host, () => stage, next => { stage = next; }, {});
+        /*
+         * A desk mount intentionally promotes `.vwf-stage` to `body` so it
+         * can occupy the whole desktop viewport.  Looking only below the
+         * original host therefore reported `READY no-vp no-walk` even though
+         * the stage was fully mounted.  Probe the current document (and keep
+         * the host as a fallback for an embedded mount) so this fixture tests
+         * the same placement mode that the real canvas uses.
+         */
+        setTimeout(() => {
+            const root = document.querySelector('.vwf-stage') || host;
+            document.title = 'READY ' + (root.querySelector('.vwf-stage-viewport') ? 'vp' : 'no-vp') + ' ' + (root.querySelector('.vwf-walk-hud') ? 'walk' : 'no-walk');
+        }, 800);
+    </script>
+</body>
+</html>

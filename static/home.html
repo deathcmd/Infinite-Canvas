@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <title>画布实验室</title>
+    <script>
+        (function(){
+            try {
+                var theme = localStorage.getItem('studio_theme') || localStorage.getItem('canvas_theme') || 'light';
+                if(theme === 'dark') document.documentElement.classList.add('theme-dark');
+            } catch(e) {}
+        })();
+    </script>
+    <script src="/static/vendor/js/lucide.js?v=2026.08.27.1787493429"></script>
+    <script src="/static/js/brand-config.js?v=2026.09.01.brand2"></script>
+    <script src="/static/js/theme.js?v=2026.09.01.ui12"></script>
+    <link rel="stylesheet" href="/static/css/home.css?v=2026.09.01.home2">
+    <link rel="stylesheet" href="/static/css/brand-theme.css?v=2026.09.01.brand2">
+    <link rel="stylesheet" href="/static/css/motion-effects.css?v=2026.08.31.desktop-motion14">
+    <link rel="stylesheet" href="/static/css/libtv-theme.css?v=2026.09.01.libtv12">
+</head>
+<body class="libtv-surface home-libtv">
+    <main class="home">
+        <div class="home-kicker">本地优先 · 自己的模型 · 自己的画布</div>
+        <section class="home-hero">
+            <h1>把故事做成片子</h1>
+            <p>从剧本拆角色、场景和分镜，或直接进自由画布排戏。不绑账号，不绑厂商，连上你自己的接口就能生成。</p>
+        </section>
+        <section class="home-actions">
+            <button class="home-card" type="button" data-go="script">
+                <div class="home-card-icon"><i data-lucide="scroll-text"></i></div>
+                <h2>从剧本开始</h2>
+                <p>粘贴或上传剧本，自动拆出角色、场景和分镜，一键铺到画布上继续改。</p>
+                <span>进入创作 →</span>
+            </button>
+            <button class="home-card" type="button" data-go="script-ai">
+                <div class="home-card-icon"><i data-lucide="sparkles"></i></div>
+                <h2>一句话写剧本</h2>
+                <p>输入题材或一句话点子，先出可用剧本，再生成片场节点。没配模型也能先出草稿。</p>
+                <span>开始写剧 →</span>
+            </button>
+            <button class="home-card" type="button" data-go="canvas">
+                <div class="home-card-icon"><i data-lucide="layout-dashboard"></i></div>
+                <h2>自由画布</h2>
+                <p>角色、场景、3D 导演台、图、视频、音频都在一张无限画布上连线执行。</p>
+                <span>打开画布 →</span>
+            </button>
+        </section>
+        <section class="home-section">
+            <div class="home-section-head">
+                <h3>最近画布</h3>
+                <button type="button" data-go="canvas">全部项目</button>
+            </div>
+            <div id="recentList" class="home-recent"></div>
+        </section>
+        <section id="connectStatus" class="home-status">
+            <div>
+                <b>模型连接</b>
+                <span id="connectCopy">还没配置接口。拆剧本和画布现在就能用，生成画面时再去连接。</span>
+            </div>
+            <button type="button" data-go="api-settings">去连接</button>
+        </section>
+    </main>
+    <script src="/static/js/home.js?v=2026.09.01.home2"></script>
+    <script src="/static/js/brand-ui.js?v=2026.09.01.brand4"></script>
+</body>
+</html>

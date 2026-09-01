@@ -1,0 +1,571 @@
+/*
+ * LibTV-inspired skin for the auxiliary desktop tools.
+ *
+ * These pages intentionally keep their existing markup, data flow, and
+ * responsive layout.  The class is opt-in (`body.libtv-aux`) so this file
+ * cannot alter the canvas engine or any embedded Three.js surface.  It only
+ * replaces the old paper/white presentation with the same graphite/cyan
+ * language used by the LibTV canvas shell.
+ */
+
+body.libtv-aux {
+    --page: var(--ltv-bg) !important;
+    --bg: var(--ltv-bg) !important;
+    --bg-base: var(--ltv-bg) !important;
+    --paper: var(--ltv-bg) !important;
+    --panel: rgba(20, 23, 30, .96) !important;
+    --card: #171b22 !important;
+    --soft: #1d232d !important;
+    --soft-2: #252c37 !important;
+    --line: #2a3340 !important;
+    --line-2: #3b4858 !important;
+    --line-strong: #435265 !important;
+    --ink: var(--ltv-text) !important;
+    --text: var(--ltv-text) !important;
+    --text-main: var(--ltv-text) !important;
+    --muted: var(--ltv-muted) !important;
+    --faint: var(--ltv-faint) !important;
+    --accent: var(--ltv-cyan) !important;
+    --strong: var(--ltv-purple) !important;
+    --teal: var(--ltv-cyan) !important;
+    --teal-2: #9aeaff !important;
+    --danger: var(--ltv-fail) !important;
+    --ok: var(--ltv-ok) !important;
+    --chat-bg: #0b0f15 !important;
+    --chat-panel: #141a23 !important;
+    --chat-panel-2: #111720 !important;
+    --chat-soft: #1e2836 !important;
+    --chat-line: #2a3747 !important;
+    --chat-line-2: #405169 !important;
+    --chat-text: #eef3f8 !important;
+    --chat-muted: #9ba8b9 !important;
+    --chat-faint: #708096 !important;
+    --chat-strong: #09caf5 !important;
+    --chat-strong-text: #061017 !important;
+    --chat-active-bg: #202d3e !important;
+    --chat-active-text: #eef7ff !important;
+    --chat-active-border: rgba(9, 202, 245, .44) !important;
+    --chat-user-bg: #34506a !important;
+    --chat-user-text: #f5fbff !important;
+    --chat-shadow: rgba(0, 0, 0, .38) !important;
+    color-scheme: dark !important;
+    min-height: 100vh;
+    background:
+        radial-gradient(900px 620px at 100% -8%, rgba(111, 92, 255, .13), transparent 62%),
+        radial-gradient(720px 540px at -8% 100%, rgba(9, 202, 245, .09), transparent 64%),
+        #0b0d11 !important;
+    color: var(--ltv-text) !important;
+}
+
+/* The page-local styles set the root element to their original paper colour.
+ * Mirror the surface on html as well, so a scrolled/oversized auxiliary view
+ * never flashes a light gutter behind the dark application frame. */
+html:has(body.libtv-aux) {
+    color-scheme: dark !important;
+    background: #0b0d11 !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow: auto !important;
+}
+
+body.libtv-aux { overflow: auto !important; }
+
+body.libtv-aux :where(button, input, select, textarea) {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+body.libtv-aux :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--ltv-cyan) !important;
+    outline-offset: 2px;
+}
+
+/* Tailwind utility surfaces used by the image tools.  Attribute selectors
+ * cover slash utilities without requiring escaped class names. */
+body.libtv-aux :where(
+    .bg-white,
+    .bg-gray-50,
+    .bg-gray-100,
+    .bg-slate-50,
+    .bg-slate-100,
+    .bg-\[\#fafafa\],
+    .bg-\[\#f8f8f9\],
+    [class~="bg-white/90"],
+    [class~="bg-white/95"],
+    [class~="bg-gray-50/50"]
+) {
+    background-color: var(--ltv-panel) !important;
+    color: var(--ltv-text) !important;
+    border-color: var(--ltv-line) !important;
+}
+
+body.libtv-aux :where(.bg-black, [class~="bg-black/5"], [class~="bg-black/10"]) {
+    background-color: #07090d !important;
+}
+
+body.libtv-aux :where(
+    .text-black,
+    .text-gray-900,
+    .text-gray-800,
+    .text-gray-700,
+    .text-slate-900,
+    .text-slate-800,
+    .text-slate-700
+) { color: var(--ltv-text) !important; }
+
+body.libtv-aux :where(
+    .text-gray-600,
+    .text-gray-500,
+    .text-gray-400,
+    .text-gray-300,
+    .text-slate-600,
+    .text-slate-500,
+    .text-slate-400,
+    .text-slate-300
+) { color: var(--ltv-muted) !important; }
+
+body.libtv-aux :where(
+    .border-black,
+    .border-gray-100,
+    .border-gray-200,
+    .border-gray-300,
+    .border-slate-100,
+    .border-slate-200,
+    .border-white
+) { border-color: var(--ltv-line) !important; }
+
+body.libtv-aux :where(input, textarea, select) {
+    color: var(--ltv-text) !important;
+    background-color: #111720 !important;
+    border-color: var(--ltv-line) !important;
+    caret-color: var(--ltv-cyan);
+}
+
+body.libtv-aux :where(input, textarea, select)::placeholder { color: #6f7e90 !important; }
+body.libtv-aux :where(input, textarea, select):focus {
+    border-color: rgba(9, 202, 245, .7) !important;
+    box-shadow: 0 0 0 3px rgba(9, 202, 245, .12) !important;
+}
+
+/* Shared page chrome ----------------------------------------------------- */
+body.libtv-aux :where(.container-box, .layout-container, .asset-page, .page, .studio) {
+    color: var(--ltv-text);
+}
+
+body.libtv-aux :where(h1, h2, h3, h4, .asset-title, .title, .page-head .title, .panel-title strong) {
+    color: var(--ltv-text) !important;
+}
+
+body.libtv-aux :where(.lead, .asset-sub, .sub, .page-head .sub, .status, .label, label, .field span) {
+    color: var(--ltv-muted) !important;
+}
+
+body.libtv-aux :where(.asset-panel, .content-head, .block, .graph-card, .side-card, .node-card,
+    .preview, .group, .idea-box, .engine-panel, .tool-panel, .control-panel, .work-panel,
+    .setting-row, .result-frame, .console-card, .masonry-item, .studio-preview-frame) {
+    background-color: var(--ltv-panel) !important;
+    border-color: var(--ltv-line) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .22) !important;
+}
+
+body.libtv-aux :where(.panel-head, .content-toolbar, .block-head, .graph-head,
+    .node-card-head, .topbar, .composer-wrap) { border-color: var(--ltv-line) !important; }
+
+/* Asset manager ---------------------------------------------------------- */
+body.libtv-aux .asset-page {
+    max-width: 1880px;
+    background: transparent;
+}
+body.libtv-aux .asset-tabs,
+body.libtv-aux .asset-status,
+body.libtv-aux .asset-btn,
+body.libtv-aux .asset-icon-btn,
+body.libtv-aux .asset-search-wrap,
+body.libtv-aux .asset-drop,
+body.libtv-aux .upload-grid-card,
+body.libtv-aux .nav-empty,
+body.libtv-aux .side-upload-card,
+body.libtv-aux .detail-empty,
+body.libtv-aux .asset-variant,
+body.libtv-aux .asset-card-tools,
+body.libtv-aux .tree-action-bar,
+body.libtv-aux .smart-class-group-btn,
+body.libtv-aux .smart-class-pill {
+    background-color: #171c24 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+body.libtv-aux .asset-tabs button { color: var(--ltv-muted) !important; }
+body.libtv-aux .asset-tabs button:hover,
+body.libtv-aux .asset-tabs button.active {
+    background: var(--ltv-purple) !important;
+    color: #fff !important;
+}
+body.libtv-aux .asset-btn:hover,
+body.libtv-aux .asset-icon-btn:hover,
+body.libtv-aux .nav-row:hover,
+body.libtv-aux .tree-row:hover { background: #252c37 !important; border-color: var(--ltv-line-strong) !important; }
+body.libtv-aux .asset-btn.primary,
+body.libtv-aux .asset-icon-btn.primary { background: var(--ltv-cyan) !important; color: #061017 !important; border-color: var(--ltv-cyan) !important; }
+body.libtv-aux .asset-search { color: var(--ltv-text) !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+body.libtv-aux .asset-drop { border-style: dashed; color: var(--ltv-muted) !important; }
+body.libtv-aux .asset-drop.drag-over,
+body.libtv-aux .side-upload-card.drag-over { background: rgba(9, 202, 245, .12) !important; border-color: var(--ltv-cyan) !important; }
+
+/* Script studio ---------------------------------------------------------- */
+body.libtv-aux .studio { background: transparent !important; }
+body.libtv-aux .studio .pane + .pane {
+    background: rgba(20, 23, 30, .96) !important;
+    border-color: var(--ltv-line) !important;
+}
+body.libtv-aux .studio .tab,
+body.libtv-aux .studio button.ghost,
+body.libtv-aux .studio button.file {
+    background: #171c24 !important;
+    color: var(--ltv-muted) !important;
+    border-color: var(--ltv-line) !important;
+}
+body.libtv-aux .studio .tab.active,
+body.libtv-aux .studio button.primary { background: var(--ltv-cyan) !important; color: #061017 !important; border-color: var(--ltv-cyan) !important; }
+body.libtv-aux .studio button:hover { border-color: var(--ltv-cyan) !important; color: #fff !important; }
+body.libtv-aux .studio .chip { background: rgba(9, 202, 245, .14) !important; color: #9aeaff !important; }
+body.libtv-aux .studio .group { background: #111720 !important; }
+
+/* API / ComfyUI settings ------------------------------------------------- */
+body.libtv-aux .page { background: transparent !important; }
+body.libtv-aux .page .sidebar,
+body.libtv-aux .page .side-card,
+body.libtv-aux .page .content-head,
+body.libtv-aux .page .block,
+body.libtv-aux .page .graph-card,
+body.libtv-aux .page .recommend-card,
+body.libtv-aux .page .provider-card {
+    background: rgba(20, 23, 30, .96) !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+body.libtv-aux .page :where(.provider-row, .workflow-card, .workflow-card.active, .workflow-bulk-btn,
+    .upload-btn, .action-btn, .ghost-btn, .key-btn, .field-frame, .model-row, .lora-row,
+    .model-protocol-select, .input-row, .small-input, .small-select, .pfield-input,
+    .pfield-textarea, .pfield-select, .nodes-toggle, .mini-tool, .mini-card,
+    .mini-input, .mini-textarea, .mini-image-drop, .run-result, .preview-empty) {
+    background-color: #171c24 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+body.libtv-aux .page :where(.workflow-card:hover, .workflow-card.active, .action-btn:hover,
+    .upload-btn:hover, .ghost-btn:hover, .nodes-toggle:hover, .mini-tool:hover) {
+    background-color: #252c37 !important;
+    border-color: var(--ltv-line-strong) !important;
+}
+body.libtv-aux .page :where(.action-btn.save-btn, .run-btn, .action-btn.primary-btn) {
+    background: var(--ltv-cyan) !important;
+    color: #061017 !important;
+    border-color: var(--ltv-cyan) !important;
+}
+body.libtv-aux .page :where(.action-btn.danger-btn, .workflow-bulk-btn.danger) {
+    color: #ffadb4 !important;
+    border-color: rgba(255, 135, 146, .42) !important;
+    background: rgba(127, 29, 45, .24) !important;
+}
+body.libtv-aux .page :where(.graph-svg-wrap, .mini-canvas) {
+    background-color: #0e141c !important;
+    background-image: radial-gradient(rgba(145, 175, 194, .22) 1px, transparent 1px) !important;
+    border-color: var(--ltv-line) !important;
+}
+body.libtv-aux .gnode rect { fill: #171e28 !important; stroke: #52657b !important; }
+body.libtv-aux .gnode .gn-title { fill: #edf4fb !important; }
+body.libtv-aux .gnode .gn-sub { fill: #9aaabd !important; }
+
+/* API settings has a legacy light-mode rule with a high-specificity
+ * `background` shorthand.  Repeat the shorthand on the opt-in scope so the
+ * dark surface wins even when that rule is active (no global theme mutation).
+ */
+body.libtv-surface.libtv-aux .page .content-head,
+body.libtv-surface.libtv-aux .page .block,
+body.libtv-surface.libtv-aux .page .sidebar,
+body.libtv-surface.libtv-aux .page .picker-modal,
+body.libtv-surface.libtv-aux .page .provider-onboarding-card {
+    background: rgba(20, 23, 30, .96) !important;
+    color: var(--ltv-text) !important;
+    border-color: var(--ltv-line) !important;
+}
+
+/* A few API controls are intentionally emitted by the legacy renderer with
+ * a light-mode `background` declaration and `!important`.  Keep these
+ * explicit selectors scoped to the page and opt-in skin. */
+body.libtv-surface.libtv-aux .page .provider-card,
+body.libtv-surface.libtv-aux .page .add-btn,
+body.libtv-surface.libtv-aux .page .field-frame,
+body.libtv-surface.libtv-aux .page .key-panel,
+body.libtv-surface.libtv-aux .page .key-btn,
+body.libtv-surface.libtv-aux .page .action-btn,
+body.libtv-surface.libtv-aux .page .ghost-btn,
+body.libtv-surface.libtv-aux .page .model-row,
+body.libtv-surface.libtv-aux .page .lora-row {
+    background: #171c24 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+body.libtv-surface.libtv-aux .page .provider-card.active {
+    background: linear-gradient(135deg, rgba(111, 92, 255, .32), rgba(9, 202, 245, .13)) !important;
+    border-color: rgba(111, 92, 255, .68) !important;
+}
+body.libtv-surface.libtv-aux .page .provider-mark,
+body.libtv-surface.libtv-aux .page .provider-protocol-pill {
+    background: #202a38 !important;
+    border-color: var(--ltv-line-strong) !important;
+    color: #b9c7d8 !important;
+}
+body.libtv-surface.libtv-aux .provider-card-banner .ms-icon-light,
+body.libtv-surface.libtv-aux .provider-card-banner .runninghub-icon.ms-icon-light,
+body.libtv-surface.libtv-aux .provider-card-banner .volcengine-icon.ms-icon-light { display: none !important; }
+body.libtv-surface.libtv-aux .provider-card-banner .ms-icon-dark,
+body.libtv-surface.libtv-aux .provider-card-banner .runninghub-icon.ms-icon-dark,
+body.libtv-surface.libtv-aux .provider-card-banner .volcengine-icon.ms-icon-dark { display: block !important; }
+body.libtv-surface.libtv-aux .page .add-btn:hover,
+body.libtv-surface.libtv-aux .page .action-btn:hover,
+body.libtv-surface.libtv-aux .page .ghost-btn:hover,
+body.libtv-surface.libtv-aux .page .key-btn:hover {
+    background: #252c37 !important;
+    border-color: var(--ltv-cyan) !important;
+    color: #fff !important;
+}
+
+/* Image creation / enhancement / camera tools -------------------------- */
+body.libtv-aux :where(.container-box, .layout-container) {
+    background: transparent !important;
+}
+body.libtv-aux :where(.nano-input, .upload-item, .result-frame, .tool-panel, .control-panel,
+    .console-card, .studio-preview-frame, .engine-panel, .engine-switch, .mode-switcher,
+    .mode-switch, .masonry-item, .loading-box) {
+    background-color: #14191f !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+}
+body.libtv-aux :where(.nano-input, textarea, input[type="text"], select) { background-color: #101720 !important; }
+body.libtv-aux :where(.upload-item, .pfield-image-drop) { border-style: dashed !important; }
+body.libtv-aux :where(.upload-item:hover, .upload-item.drag-over, .pfield-image-drop:hover) {
+    border-color: var(--ltv-cyan) !important;
+    background-color: rgba(9, 202, 245, .1) !important;
+}
+body.libtv-aux :where(.glass-btn, .btn-render, .gen-btn, .run-btn) {
+    background: linear-gradient(135deg, var(--ltv-cyan), #50a9ff) !important;
+    color: #061017 !important;
+    border-color: transparent !important;
+    box-shadow: 0 10px 24px rgba(9, 202, 245, .2) !important;
+}
+body.libtv-aux :where(.glass-btn:hover, .btn-render:hover, .gen-btn:hover, .run-btn:hover) {
+    filter: brightness(1.1) saturate(1.08);
+    transform: translateY(-1px);
+}
+body.libtv-aux :where(.mode-btn, .model-option, .size-fit-btn) { color: var(--ltv-muted) !important; }
+body.libtv-aux :where(.mode-btn.active, .model-option.active, .size-fit-btn.active) {
+    background: var(--ltv-purple) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 18px rgba(111, 92, 255, .24) !important;
+}
+body.libtv-aux :where(.mode-glider) { background: var(--ltv-purple) !important; }
+body.libtv-aux :where(.ios-slider) {
+    background: #2a3340 !important;
+    border-color: #435265 !important;
+}
+body.libtv-aux :where(.ios-slider)::before {
+    background: #dfe8f1 !important;
+    border-color: #9aaabd !important;
+}
+body.libtv-aux :where(.ios-switch input:checked + .ios-slider, .ios-switch.active, .cloud-dot.active) {
+    background-color: var(--ltv-cyan) !important;
+}
+body.libtv-aux :where(input[type="range"]) { accent-color: var(--ltv-cyan) !important; }
+body.libtv-aux :where(.preview-img, .studio-preview-img) { border-color: var(--ltv-line) !important; }
+body.libtv-aux :where(.hbm-btn, .engine-btn) {
+    background: #171c24 !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-muted) !important;
+}
+body.libtv-aux :where(.hbm-btn:hover, .engine-btn:hover) {
+    background: #252c37 !important;
+    border-color: var(--ltv-cyan) !important;
+    color: #fff !important;
+}
+body.libtv-aux :where(.hbm-btn.hbm-primary, .engine-btn.active) {
+    background: var(--ltv-purple) !important;
+    border-color: var(--ltv-purple) !important;
+    color: #fff !important;
+}
+body.libtv-aux :where(.hbm-btn.hbm-danger) {
+    background: rgba(127, 29, 45, .28) !important;
+    border-color: rgba(255, 135, 146, .46) !important;
+    color: #ffadb4 !important;
+}
+body.libtv-aux .mode-badge {
+    background: rgba(111, 92, 255, .2) !important;
+    border-color: rgba(111, 92, 255, .45) !important;
+    color: #c8c0ff !important;
+}
+body.libtv-aux :where(.gallery-lightbox, .image-lightbox, .image-preview-modal) {
+    background: rgba(3, 6, 10, .82) !important;
+    backdrop-filter: blur(18px);
+}
+body.libtv-aux :where(.studio-contact-modal, .studio-modal) {
+    background: rgba(3, 6, 10, .84) !important;
+    backdrop-filter: blur(18px);
+}
+body.libtv-aux :where(.studio-contact-panel, .studio-modal-panel) {
+    background: #14171e !important;
+    border-color: var(--ltv-line) !important;
+    color: var(--ltv-text) !important;
+    box-shadow: 0 28px 72px rgba(0, 0, 0, .48) !important;
+}
+/* Standalone utility pages do not load the editor's brand-theme.css.  Keep
+   the project-owned contact surface fully self-contained here so asset,
+   prompt, image and chat routes expose the same maintainer affordance. */
+body.libtv-aux .studio-contact-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(3, 6, 10, .84);
+    backdrop-filter: blur(18px);
+}
+body.libtv-aux .studio-contact-modal[hidden] { display: none; }
+body.libtv-aux .studio-contact-panel {
+    width: min(430px, 100%);
+    padding: 22px;
+    border: 1px solid var(--ltv-line);
+    border-radius: 18px;
+    background: #14171e;
+    color: var(--ltv-text);
+    box-shadow: 0 28px 72px rgba(0, 0, 0, .48);
+}
+body.libtv-aux .studio-contact-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+body.libtv-aux .studio-contact-kicker { display: block; color: var(--ltv-cyan); font-size: 9px; font-weight: 900; letter-spacing: .16em; }
+body.libtv-aux .studio-contact-head h2 { margin: 5px 0 0; color: var(--ltv-text); font-size: 21px; font-weight: 900; }
+body.libtv-aux .studio-contact-close {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ltv-line);
+    border-radius: 9px;
+    background: #171c24;
+    color: var(--ltv-muted);
+    cursor: pointer;
+}
+body.libtv-aux .studio-contact-close:hover { color: #fff; border-color: var(--ltv-cyan); }
+body.libtv-aux .studio-contact-close svg { width: 15px; height: 15px; }
+body.libtv-aux .studio-contact-intro { margin: 14px 0 16px; color: var(--ltv-muted); font-size: 12px; line-height: 1.7; }
+body.libtv-aux .studio-contact-list { display: flex; flex-direction: column; gap: 8px; }
+body.libtv-aux .studio-contact-row {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border: 1px solid var(--ltv-line);
+    border-radius: 11px;
+    background: #171c24;
+    color: var(--ltv-text);
+    text-decoration: none;
+}
+body.libtv-aux a.studio-contact-row:hover { border-color: rgba(9, 202, 245, .48); background: #202c39; }
+body.libtv-aux .studio-contact-icon { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: #10151c; color: var(--ltv-cyan); }
+body.libtv-aux .studio-contact-icon svg { width: 16px; height: 16px; }
+body.libtv-aux .studio-contact-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+body.libtv-aux .studio-contact-copy strong { color: var(--ltv-text); font-size: 11px; font-weight: 850; }
+body.libtv-aux .studio-contact-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ltv-muted); font-size: 11px; }
+body.libtv-aux .studio-contact-arrow { margin-left: auto; color: var(--ltv-cyan); font-size: 15px; font-weight: 900; }
+body.libtv-aux .studio-contact-empty { padding: 13px; border: 1px dashed var(--ltv-line); border-radius: 11px; color: var(--ltv-muted); background: #171c24; font-size: 11px; line-height: 1.6; }
+body.libtv-aux .studio-contact-foot { margin-top: 15px; color: var(--ltv-faint); font-size: 10px; line-height: 1.5; }
+body.libtv-aux .studio-contact-launcher {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 120;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    border: 1px solid var(--ltv-line-strong);
+    border-radius: 999px;
+    background: #171c24;
+    color: var(--ltv-text);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .42);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 850;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+body.libtv-aux .studio-contact-launcher:hover { color: #fff; background: #273445; border-color: rgba(9, 202, 245, .48); transform: translateY(-1px); }
+body.libtv-aux .studio-contact-launcher:focus-visible { outline: 2px solid var(--ltv-cyan); outline-offset: 3px; }
+body.libtv-aux .studio-contact-launcher svg { width: 15px; height: 15px; flex: 0 0 auto; }
+body.libtv-aux :where(.gallery-lightbox img, .image-lightbox img, .image-preview-modal img) {
+    background: #0f141b !important;
+    border-color: var(--ltv-line) !important;
+}
+
+/* GPT chat --------------------------------------------------------------- */
+body.libtv-aux .chat-shell,
+body.libtv-aux .chat-main,
+body.libtv-aux .messages { background: var(--chat-bg) !important; color: var(--chat-text) !important; }
+body.libtv-aux :where(.topbar, .composer-wrap) {
+    background: rgba(11, 15, 21, .84) !important;
+    border-color: var(--chat-line) !important;
+}
+body.libtv-aux :where(.composer, .chat-rail, .system-prompt-popover, .model-picker-popover,
+    .resolution-picker-popover, .history-popover, .lightbox-card, #lightboxCard) {
+    background: rgba(20, 26, 35, .97) !important;
+    border-color: var(--chat-line) !important;
+    color: var(--chat-text) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .42) !important;
+}
+body.libtv-aux :where(.action-btn, .model-picker-button, .resolution-picker-button,
+    .send-btn, .upload-btn, .thread-bulk-btn, .system-prompt-actions button,
+    .model-picker-scope, .resolution-picker-scope) {
+    background: #171f2b !important;
+    border-color: var(--chat-line-2) !important;
+    color: var(--chat-muted) !important;
+}
+body.libtv-aux :where(.action-btn:hover, .model-picker-button:hover, .resolution-picker-button:hover,
+    .upload-btn:hover, .thread-bulk-btn:hover, .system-prompt-actions button:hover) {
+    background: #253244 !important;
+    border-color: var(--ltv-cyan) !important;
+    color: #fff !important;
+}
+body.libtv-aux :where(.send-btn, .thread-bulk-btn.primary, .system-prompt-actions .primary,
+    .model-picker-option.active, .resolution-picker-option.active) {
+    background: var(--ltv-cyan) !important;
+    border-color: var(--ltv-cyan) !important;
+    color: #061017 !important;
+}
+body.libtv-aux :where(.thread-item, .model-picker-option, .resolution-picker-option) { color: var(--chat-muted) !important; }
+body.libtv-aux :where(.thread-item:hover, .thread-item.active, .model-picker-option:hover,
+    .resolution-picker-option:hover) {
+    background: var(--chat-active-bg) !important;
+    border-color: var(--chat-active-border) !important;
+    color: var(--chat-text) !important;
+}
+body.libtv-aux .system-prompt-textarea { background: #101720 !important; color: var(--chat-text) !important; border-color: var(--chat-line) !important; }
+body.libtv-aux .bubble.assistant { background: #141b24 !important; border-color: var(--chat-line) !important; color: var(--chat-text) !important; }
+body.libtv-aux .bubble.user { background: #34506a !important; color: var(--chat-user-text) !important; }
+
+/* Keep native media controls legible on Chromium's dark palette. */
+body.libtv-aux :where(video, audio) { color-scheme: dark; }
+
+@media (min-width: 901px) {
+    body.libtv-aux:not(.chat-page) { min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.libtv-aux *, body.libtv-aux *::before, body.libtv-aux *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+    }
+}
