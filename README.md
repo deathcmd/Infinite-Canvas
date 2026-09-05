@@ -39,7 +39,7 @@ Canvas Lab 是一个面向个人创作者的本地 AI 创作工作台。它把�
 
 ## 快速开始（Windows）
 
-1. 安装 Python 依赖：双击 `安装依赖.bat`，或执行 `python -m pip install -r requirements.txt`。
+1. 安装 Python 依赖：双击 `安装依赖.bat`，或执行 `python -m pip install -r requirements.txt`。依赖清单包含 Uvicorn 的 WebSocket 支持，保证画布、资产与任务状态实时同步。
 2. 复制 `.env.example` 为 `API/.env`，只填写你自己的 provider 配置。真实密钥不要提交到 Git。
 3. 双击 `run.bat`，或执行：
 
