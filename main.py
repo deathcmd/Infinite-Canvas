@@ -9370,17 +9370,6 @@ def unique_asset_category_dir(library, base_name: str) -> str:
         i += 1
     return candidate
 
-def remove_asset_library_file(item) -> None:
-    """删除资产对应的本地文件（仅限 library 副本，删了不影响 /output 原图）。日志不影响主流程。"""
-    try:
-        url = item.get("url") if isinstance(item, dict) else ""
-        path = output_file_from_url(url)
-        if path and os.path.isfile(path):
-            os.remove(path)
-    except Exception as exc:
-        print(f"删除资产文件失败: {exc}")
-
-
 def cleanup_asset_library_file_if_unreferenced(item) -> str:
     """在资产索引已经更新后，安全清理资产库副本。
 
@@ -9436,7 +9425,6 @@ def make_asset_library_item(src: str, name: str = "", subdir: str = "") -> Tuple
         "created_at": now_ms(),
     }
     return dest_name, item
-    return lib
 
 ASSET_CLASSIFICATION_PROMPT = """请识别这张图片，输出严格 JSON，不要 Markdown，不要解释。
 目标是给素材库做非常全面的筛选分类。所有字段都用中文短标签数组，尽量具体但不要虚构。
